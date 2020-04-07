@@ -1,0 +1,14 @@
+[package]
+name = "prisma-codegen"
+version = "0.1.0"
+authors = ["Seun <seunlanlege@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+query-core = { path = "../prisma-engines/query-engine/core" }
+prisma-models = { path = "../prisma-engines/libs/prisma-models" }
+prisma = { path = "../prisma-engines/query-engine/prisma" }
+datamodel = { path = "../prisma-engines/libs/datamodel/core" }
+itertools = "0.9.0"
+prisma-client-derive = { path = "./derive" }
+Inflector = "0.11.4"
