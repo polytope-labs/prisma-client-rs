@@ -1,0 +1,388 @@
+use datamodel::\{parse_datamodel, parse_configuration, Source};
+use query_core::\{
+	SupportedCapabilities, QuerySchemaBuilder, BuildMode, QuerySchema,
+	executor::\{InterpretingExecutor, QueryExecutor},
+	query_document::*,
+};
+use url::Url;
+use rust_decimal::Decimal;
+use prisma_models::DatamodelConverter;
+use std::\{sync::Arc, collections::HashMap};
+use std::\{path::PathBuf, str::FromStr, collections::BTreeMap};
+use serde::\{de::DeserializeOwned, Serialize, Deserialize};
+mod serialize;
+use serialize::to_query_args;
+use sql_query_connector::\{Mysql, PostgreSql, Sqlite, FromSource};
+use query_connector::Connector;
+use graphql_parser::\{
+	self as gql,
+	query::\{
+		Definition, Document, OperationDefinition, Selection as GqlSelection, SelectionSet, Value,
+	}
+};
+use prisma_client_rs::\{Query, Queryable};
+
+// ====================== Enums ==========================
+
+{{- for enum in enums }}
+#[derive(Serialize, Debug)]
+pub enum {enum.name} \{
+	{{- for variant in enum.variants}}
+	#[serde(rename = "{variant.actual}")]
+	{variant.render},
+	{{- endfor}}
+}
+{{- endfor }}
+
+// ======================================================================================
+
+// ====================================== Input Types ===================================
+{{- for struct in inputs }}
+#[derive(Default, Serialize, Debug)]
+pub struct {struct.name} \{
+    {{- for field in struct.fields}}
+    {{- if field.is_required }}
+    {{- else }}
+    #[serde(skip_serializing_if = "Option::is_none")]
+    {{- endif }}
+    #[serde(rename = "{field.name.actual}")]
+    pub {field.name.render}: {field.type | unescaped},
+    {{- endfor }}
+}
+{{- endfor }}
+// ======================================================================================
+
+// ====================================== Outpu Types ===================================
+{{- for struct in outputs }}
+#[derive(Default, Serialize, Deserialize, Debug, Query)]
+pub struct {struct.name} \{
+    {{- for field in struct.fields}}
+    {{- if field.is_required }}
+    {{- else }}
+    #[serde(skip_serializing_if = "Option::is_none")]
+    {{- endif }}
+    pub {field.name}: {field.type | unescaped},
+    {{- endfor }}
+}
+{{- endfor }}
+// ======================================================================================
+
+
+// ======================================= Argument Types ==========================================
+{{- for operation in operations }}
+{{- for struct in operation.outputs }}
+#[derive(Default, Serialize, Debug)]
+pub struct {struct.name} \{
+    {{-for field in struct.fields}}
+    {{-if field.is_required }}
+    {{- else }}
+    #[serde(skip_serializing_if = "Option::is_none")]
+    {{- endif }}
+    pub {field.name_filtered}: {field.type | unescaped},
+    {{-endfor}}
+}
+{{- endfor }}
+{{- endfor }}
+// ============================================================================================
+
+pub struct Prisma \{
+	executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
+	query_schema: Arc<QuerySchema>,
+}
+
+impl Prisma \{
+	pub async fn init(force_transactions: bool) -> Result<Self, Error> \{
+		let datamodel_str = r###"{datamodel | unescaped}"###;
+		let config = parse_configuration(datamodel_str).unwrap();
+		let source = config.datasources.first()
+			.expect("Please supply a datasource in your datamodel.prisma file");
+
+		let model = parse_datamodel(datamodel_str).unwrap();
+		let (db, executor) = load_executor(&**source, force_transactions).await?;
+
+		let internal_model = DatamodelConverter::convert(&model)
+			.build(db);
+		let cap = SupportedCapabilities::empty();
+		let schema_builder = QuerySchemaBuilder::new(
+			&internal_model,
+			&cap,
+			BuildMode::Modern,
+			false,
+		);
+		let query_schema = Arc::new(schema_builder.build());
+
+		Ok(Self \{ executor, query_schema })
+	}
+
+	{{- for operation in operations }}
+    {{- for method in operation.methods }}
+    pub async fn {method.fn_name}{{ if not method.is_batch }}<T>{{ endif }}(&self{method.arg | unescaped}) -> Result<{{ if method.is_list }}Vec<{method.return | unescaped}>{{ else }}{method.return | unescaped}{{ endif }}, Error>
+        {{ if not method.is_batch }}where
+            T: Queryable + DeserializeOwned,
+        {{- endif }}
+    \{
+        let query = String::from("{operation.name} \{ {method.query_name}");
+    	let mut operation_args = String::new();
+
+        {{- for arg in method.args }}
+    	{{- if arg.only }}
+    	{{- if not arg.is_required }}
+        if {arg.name_filtered}.is_some() \{
+        	operation_args.push_str(&format!(
+        		"{arg.name}: \{},",
+        		to_query_args({arg.name_filtered}.as_ref().unwrap()).unwrap()
+        	));
+        }
+        {{- else }}
+        operation_args.push_str(&format!(
+        	"{arg.name}: \{},",
+        	to_query_args({arg.name_filtered}).unwrap()
+        ));
+        {{- endif }}
+    	{{- else }}
+    	{{- if not arg.is_required }}
+        if data.{arg.name_filtered}.is_some() \{
+        	operation_args.push_str(&format!(
+        		"{arg.name}: \{},",
+        		to_query_args(data.{arg.name_filtered}.as_ref().unwrap()).unwrap()
+        	));
+        }
+        {{- else }}
+        operation_args.push_str(&format!(
+        	"{arg.name}: \{},",
+        	to_query_args(&data.{arg.name_filtered}).unwrap()
+        ));
+        {{- endif }}
+    	{{- endif }}
+    	{{- endfor }}
+    	if !operation_args.is_empty() \{
+    		operation_args = format!("(\{})", operation_args);
+    	}
+    	let mut query = format!(r#"
+    		\{} \{} \{}"#,
+    		query,
+    		operation_args,
+    		{method.query | unescaped},
+    	);
+    	query.push_str("}");
+    	let doc = gql::parse_query(&query)?;
+    	let operation = convert(doc)?;
+    	let schema = self.query_schema.clone();
+    	let response = self.executor.execute(operation, schema).await?;
+    	if response.errors.len() > 0 \{
+    	    // return the errors.
+    	    todo!("proper error")
+    	}
+
+    	// serialize from map to Queryable.
+    	let value = serde_json::to_value(&response.data.get("{method.query_name}").unwrap())
+    		.expect("Deserializing to serde_json::Value should be infallible");
+    	let data = serde_json::from_value(value)
+    		.expect("Validation is done by prisma_client_derive::Queryable, this is infallible");
+    	Ok(data)
+    }
+    {{- endfor }}
+    {{- endfor }}
+}
+
+#[derive(derive_more::From, derive_more::Display, Debug)]
+pub enum Error \{
+	QueryError(query_core::error::CoreError),
+	GraphqlParseError(gql::query::ParseError),
+	UrlParseError(url::ParseError),
+	QueryConnector(query_connector::error::ConnectorError),
+	Other(String),
+}
+
+async fn load_executor(
+	source: &(dyn Source + Send + Sync),
+	force_transactions: bool,
+) -> Result<(String, Box<dyn QueryExecutor + Send + Sync + 'static>), Error> \{
+	match source.connector_type() \{
+		"sqlite" => \{
+			log::info!("Loading SQLite connector.");
+			let sqlite = Sqlite::from_source(source).await?;
+			log::info!("Loaded SQLite connector.");
+
+			let path = PathBuf::from(sqlite.file_path());
+			let db_name = path.file_stem().unwrap().to_str().unwrap().to_owned(); // Safe due to previous validations.
+			let executor = sql_executor("sqlite", sqlite, false);
+			Ok((db_name, executor))
+		},
+		"mysql" => \{
+			log::info!("Loading MySQL connector.");
+			let mysql = Mysql::from_source(source).await?;
+			log::info!("Loaded MySQL connector.");
+			let executor = sql_executor("mysql", mysql, false);
+			let url = Url::parse(&source.url().value)?;
+			let err_str = "No database found in connection string";
+
+			let mut db_name = url
+				.path_segments()
+				.ok_or_else(|| Error::Other(err_str.into()))?;
+
+			let db_name = db_name.next().expect(err_str).to_owned();
+			Ok((db_name, executor))
+		},
+		"postgresql" => \{
+			let url = Url::parse(&source.url().value)?;
+			let params: HashMap<String, String> = url.query_pairs().into_owned().collect();
+
+			let db_name = params
+				.get("schema")
+				.map(ToString::to_string)
+				.unwrap_or_else(|| String::from("public"));
+
+			log::info!("Loading Postgres connector.");
+			let psql = PostgreSql::from_source(source).await?;
+			log::info!("Loaded Postgres connector.");
+			let executor = sql_executor("postgres", psql, force_transactions);
+
+			Ok((db_name, executor))
+		},
+		x => Err(Error::Other(format!(
+			"Unsupported connector type: \{}",
+			x
+		))),
+	}
+}
+
+fn sql_executor<T>(
+	primary_connector: &'static str,
+	connector: T,
+	force_transactions: bool,
+) -> Box<dyn QueryExecutor + Send + Sync + 'static>
+	where
+		T: Connector + Send + Sync + 'static,
+\{
+	Box::new(InterpretingExecutor::new(
+		connector,
+		primary_connector,
+		force_transactions,
+	))
+}
+
+fn convert(gql_doc: Document<String>) -> Result<Operation, Error> \{
+	let mut operations: Vec<Operation> = gql_doc
+		.definitions
+		.into_iter()
+		.map(convert_definition)
+		.collect::<Result<Vec<Vec<Operation>>, Error>>()
+		.map(|r| r.into_iter().flatten().collect::<Vec<Operation>>())?;
+
+	let operation = operations
+		.pop()
+		.ok_or_else(|| Error::Other("Document contained no operations.".into()))?
+		.dedup_selections();
+
+	Ok(operation)
+}
+
+fn convert_definition(def: Definition<String>) -> Result<Vec<Operation>, Error> \{
+	match def \{
+		Definition::Fragment(f) => Err(Error::Other(
+			format!("Fragment '\{}', at position \{}.", f.name, f.position),
+		)),
+		Definition::Operation(op) => match op \{
+			OperationDefinition::Subscription(s) => Err(Error::Other(
+				format!("At position \{}.", s.position),
+			)),
+			OperationDefinition::SelectionSet(s) => convert_query(s),
+			OperationDefinition::Query(q) => convert_query(q.selection_set),
+			OperationDefinition::Mutation(m) => convert_mutation(m.selection_set),
+		},
+	}
+}
+
+fn convert_query(selection_set: SelectionSet<String>) -> Result<Vec<Operation>, Error> \{
+	convert_selection_set(selection_set)
+		.map(|fields| fields.into_iter().map(|field| Operation::Read(field)).collect())
+}
+
+fn convert_mutation(selection_set: SelectionSet<String>) -> Result<Vec<Operation>, Error> \{
+	convert_selection_set(selection_set).map(|fields| \{
+		fields
+			.into_iter()
+			.map(|selection| Operation::Write(selection))
+			.collect()
+	})
+}
+
+fn convert_selection_set(selection_set: SelectionSet<String>) -> Result<Vec<Selection>, Error> \{
+	selection_set
+		.items
+		.into_iter()
+		.map(|item| match item \{
+			GqlSelection::Field(f) => \{
+				let arguments: Vec<(String, QueryValue)> = f
+					.arguments
+					.into_iter()
+					.map(|(k, v)| Ok((k, convert_value(v)?)))
+					.collect::<Result<Vec<_>, Error>>()?;
+
+				let mut builder = Selection::builder(f.name);
+				builder.set_arguments(arguments);
+				builder.nested_selections(convert_selection_set(f.selection_set)?);
+
+				if let Some(alias) = f.alias \{
+					builder.alias(alias);
+				};
+
+				Ok(builder.build())
+			}
+
+			GqlSelection::FragmentSpread(fs) => Err(Error::Other(
+				format!("Fragment '\{}', at position \{}.", fs.fragment_name, fs.position),
+			)),
+
+			GqlSelection::InlineFragment(i) => Err(Error::Other(
+				format!("At position \{}.", i.position),
+			)),
+		})
+		.collect()
+}
+
+
+fn convert_value(value: Value<String>) -> Result<QueryValue, Error> \{
+	match value \{
+		Value::Variable(name) => Err(Error::Other(
+			format!("Variable '\{}'.", name),
+		)),
+		Value::Int(i) => match i.as_i64() \{
+			Some(i) => Ok(QueryValue::Int(i)),
+			None => Err(Error::Other(format!(
+				"Invalid 64 bit integer: \{:?}",
+				i
+			))),
+		},
+		// We can't use Decimal::from_f64 here due to a bug in rust_decimal.
+		// Issue: https://github.com/paupino/rust-decimal/issues/228<Paste>
+		Value::Float(f) => match Decimal::from_str(&f.to_string()).ok() \{
+			Some(dec) => Ok(QueryValue::Float(dec)),
+			None => Err(Error::Other(format!(
+				"invalid 64-bit float: \{:?}",
+				f
+			))),
+		},
+		Value::String(s) => Ok(QueryValue::String(s)),
+		Value::Boolean(b) => Ok(QueryValue::Boolean(b)),
+		Value::Null => Ok(QueryValue::Null),
+		Value::Enum(e) => Ok(QueryValue::Enum(e)),
+		Value::List(values) => \{
+			let values: Vec<QueryValue> = values
+				.into_iter()
+				.map(convert_value)
+				.collect::<Result<Vec<QueryValue>, Error>>()?;
+
+			Ok(QueryValue::List(values))
+		}
+		Value::Object(map) => \{
+			let values = map
+				.into_iter()
+				.map(|(k, v)| convert_value(v).map(|v| (k, v)))
+				.collect::<Result<BTreeMap<String, QueryValue>, Error>>()?;
+
+			Ok(QueryValue::Object(values))
+		}
+	}
+}

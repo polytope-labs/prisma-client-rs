@@ -1,0 +1,14 @@
+[package]
+name = "prisma-codegen"
+version = "0.1.0"
+authors = ["Seun <seunlanlege@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+query-core = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
+query-engine = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
+prisma-models = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
+datamodel = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
+Inflector = "0.11.4"
+tinytemplate = "1.0.3"
+serde_json = "1.0.51"

@@ -1,0 +1,10 @@
+datasource pg {
+	provider = "postgres"
+	url = "postgres://root:prisma@localhost:5432/default@default"
+}
+
+model User {
+    id String @id
+    name String
+    email String @unique
+}

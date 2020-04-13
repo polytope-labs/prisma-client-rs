@@ -3,7 +3,6 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, DeriveInput};
-use itertools::Itertools;
 
 #[proc_macro_derive(Query)]
 pub fn my_macro(input: TokenStream) -> TokenStream {
@@ -15,7 +14,7 @@ pub fn my_macro(input: TokenStream) -> TokenStream {
         _ => unreachable!(),
     };
     let (impl_gen, type_gen, where_clause) = input.generics.split_for_impl();
-    // todo: validate against another struct.
+    // todo: validate against remote struct.
     let fields = m.fields.iter()
         .map(|f| {
             let (name, ty) = (f.ident.as_ref().unwrap(), &f.ty);
