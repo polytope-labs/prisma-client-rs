@@ -20,7 +20,7 @@ pub fn my_macro(input: TokenStream) -> TokenStream {
             let (name, ty) = (f.ident.as_ref().unwrap(), &f.ty);
             let name = format!("{}", name);
             quote! {
-                query.push_str(&format!("{} {} ", #name, <#ty as prisma_client::Queryable>::query()));
+                query.push_str(&format!("{} {} ", #name, <#ty as prisma_client_rs::Queryable>::query()));
             }
         })
         .collect::<Vec<_>>();
