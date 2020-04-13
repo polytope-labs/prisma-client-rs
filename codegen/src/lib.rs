@@ -194,15 +194,30 @@ fn build_operation(out: &DMMFOutputType) -> Value {
 			let use_batch = field.name.contains("deleteMany") || field.name.contains("updateMany")
 				|| field.name.contains("aggregate");
 
+			let generics = if !use_batch {
+				"<T>"
+			} else {
+				""
+			};
+
+			let return_ty = if use_batch {
+				"BatchPayload"
+			} else if field.name.contains("findOne") {
+				"Option<T>"
+			} else {
+				"T"
+			};
+
 			let method = json!({
 				"fn_name": format_method_name(field.name.clone()),
 				"query_name": field.name,
 				"args": args,
 				"arg": arg,
-				"is_list": field.name.contains("findMany"),
+				"generics": generics,
+				"return_optional": field.name.contains("findOne"),
 				"is_batch": use_batch,
 				"query": if use_batch { r#""{ count }""# } else { "T::query()" },
-				"return": if use_batch { "BatchPayload" } else { "T" }
+				"return": return_ty
 			});
 
 			methods.push(method);

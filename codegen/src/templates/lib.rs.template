@@ -116,7 +116,7 @@ impl Prisma \{
 
 	{{- for operation in operations }}
     {{- for method in operation.methods }}
-    pub async fn {method.fn_name}{{ if not method.is_batch }}<T>{{ endif }}(&self{method.arg | unescaped}) -> Result<{{ if method.is_list }}Vec<{method.return | unescaped}>{{ else }}{method.return | unescaped}{{ endif }}, Error>
+    pub async fn {method.fn_name}{{ method.generics | unescaped }}(&self{method.arg | unescaped}) -> Result<{{ method.return | unescaped}}, Error>
         {{ if not method.is_batch }}where
             T: Queryable + DeserializeOwned,
         {{- endif }}
