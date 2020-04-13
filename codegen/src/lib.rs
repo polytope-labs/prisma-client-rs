@@ -202,7 +202,7 @@ fn build_operation(out: &DMMFOutputType) -> Value {
 
 			let return_ty = if use_batch {
 				"BatchPayload"
-			} else if field.name.contains("findOne") {
+			} else if field.name.contains("findOne") || field.name.contains("deleteOne")   {
 				"Option<T>"
 			} else {
 				"T"
