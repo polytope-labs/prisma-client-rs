@@ -26,7 +26,7 @@ pub fn my_macro(input: TokenStream) -> TokenStream {
         .collect::<Vec<_>>();
 
     let expanded = quote! {
-        impl #impl_gen prisma_client::Queryable for #name #type_gen #where_clause {
+        impl #impl_gen prisma_client_rs::Queryable for #name #type_gen #where_clause {
             fn query() -> String {
                 let mut query = String::new();
                 #(#fields)*
