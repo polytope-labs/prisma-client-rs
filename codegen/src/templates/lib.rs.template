@@ -20,7 +20,7 @@ use graphql_parser::\{
 		Definition, Document, OperationDefinition, Selection as GqlSelection, SelectionSet, Value,
 	}
 };
-use prisma_client_rs::{Query, Queryable};
+use prisma_client_rs::\{Query, Queryable};
 
 // ====================== Enums ==========================
 
