@@ -6,6 +6,8 @@ use prisma_models::DatamodelConverter;
 use std::sync::Arc;
 use inflector::Inflector;
 use serde_json::{json, Value};
+use query_engine::dmmf::schema::TypeKind;
+use prisma_models::dml::Field;
 
 /// Generates the client.
 pub fn generate(datamodel: &str, out_dir: &str) {
@@ -43,20 +45,36 @@ fn generate_client(model_str: &str) -> String {
 	let dmmf = render_dmmf(&model, query_schema);
 	let mut tt = tinytemplate::TinyTemplate::new();
 	tt.add_template("client", include_str!("./templates/lib.rs.template")).unwrap();
+	let models = model.models.into_iter()
+		.map(|m| {
+			m.fields.into_iter()
+				.filter_map(|f| {
+					if f.field_type.is_relation() {
+						Some(f)
+					} else {
+						None
+					}
+				})
+				.collect::<Vec<_>>()
+		})
+		.flatten()
+		.collect::<Vec<_>>();
 
 	let enums = dmmf.schema.enums
 		.iter()
 		.map(|enu| {
-			json!({
-				"name": enu.name,
-				"variants": enu.values.iter()
+			let variants = enu.values.iter()
 				.map(|v| {
 					json!({
 						"render": v.to_class_case(),
 						"actual": v,
 					})
 				})
-				.collect::<Vec<_>>(),
+				.collect::<Vec<_>>();
+			json!({
+				"name": enu.name,
+				"default": enu.values[0].to_class_case(),
+				"variants": variants,
 			})
 		})
 		.collect::<Vec<_>>();
@@ -65,13 +83,18 @@ fn generate_client(model_str: &str) -> String {
 		.map(|typ| {
 			let fields = typ.fields.iter()
 				.map(|field| {
+					let name = if field.name == "where" {
+						"filter".to_owned()
+					} else {
+						field.name.to_snake_case()
+					};
 					json!({
 						"is_required": field.input_type.is_required,
 						"name": json!({
-							"render": field.name.to_snake_case(),
+							"render": name,
 							"actual": field.name,
 						}),
-						"type": format_to_rust_type(&field.input_type),
+						"type": format_to_recursive_rust_type(&field.name, &models, &field.input_type),
 					})
 				})
 				.collect::<Vec<_>>();
@@ -123,6 +146,44 @@ fn generate_client(model_str: &str) -> String {
 	});
 
 	tt.render("client", &data).unwrap()
+}
+
+
+/// converts DMMFTypeInfo to a rust type.
+fn format_to_recursive_rust_type(name: &str, fields: &Vec<Field>, typ: &DMMFTypeInfo) -> String {
+	let relations = fields.iter()
+		.filter_map(|f| {
+			if name.contains(&f.name) {
+				Some(())
+			} else {
+				None
+			}
+		})
+		.collect::<Vec<_>>();
+	let formatted = match typ.typ.as_str() {
+		"Int" => "u64",
+		_ => &typ.typ,
+	};
+
+	let formatted = match typ.kind{
+		TypeKind::Object if relations.len() > 0 => {
+			println!("name: {}, TypeKind::Object: {:?}", name, typ);
+			format!("Box<{}>", formatted)
+		}
+		_ => formatted.to_string()
+	};
+
+	let formatted = if typ.is_list {
+		format!("Vec<{}>", formatted)
+	} else {
+		formatted
+	};
+
+	if !typ.is_required {
+		format!("Option<{}>", formatted)
+	} else {
+		formatted
+	}
 }
 
 /// converts DMMFTypeInfo to a rust type.
@@ -202,8 +263,10 @@ fn build_operation(out: &DMMFOutputType) -> Value {
 
 			let return_ty = if use_batch {
 				"BatchPayload"
-			} else if field.name.contains("findOne") || field.name.contains("deleteOne")   {
+			} else if field.name.contains("findOne")   {
 				"Option<T>"
+			} else if field.name.contains("findMany") {
+				"Vec<T>"
 			} else {
 				"T"
 			};
@@ -266,13 +329,17 @@ mod test {
 	url = "mysql://root:prisma@localhost:3306/default@default"
 }
 
+
+model Organization {
+    id String @id @default(cuid())
+    admin User[]
+}
+
 model User {
     id String @id @default(cuid())
-    name String
-    email String @unique
-    password String
-    subaccount String
+	organization Organization @relation(fields: [organizationId], references: [id])
+    organizationId String
 }"##);
-		println!("{}", out);
+		// println!("{}", out);
 	}
 }

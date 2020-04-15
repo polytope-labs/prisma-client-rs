@@ -1,14 +1,26 @@
 /// Prisma Client.
 ///
 /// We re-export them under one crate
-pub use prisma_codegen::*;
-pub use prisma_derive::*;
+pub use prisma_codegen::generate;
+pub use prisma_derive::Query;
 
 pub trait Queryable {
 	fn query() -> String;
 }
 
 impl<T: Queryable> Queryable for Vec<T> {
+	fn query() -> String {
+		T::query()
+	}
+}
+
+impl<T: Queryable> Queryable for Option<T> {
+	fn query() -> String {
+		T::query()
+	}
+}
+
+impl<T: Queryable> Queryable for Box<T> {
 	fn query() -> String {
 		T::query()
 	}

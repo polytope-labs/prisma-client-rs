@@ -9,11 +9,24 @@ pub fn my_macro(input: TokenStream) -> TokenStream {
     // Parse the input tokens into a syntax tree
     let input = parse_macro_input!(input as DeriveInput);
     let name = input.ident;
+    let (impl_gen, type_gen, where_clause) = input.generics.split_for_impl();
+
     let m = match input.data {
         syn::Data::Struct(s) => s,
+        syn::Data::Enum(_) => {
+            let expanded = quote! {
+                impl #impl_gen prisma_client_rs::Queryable for #name #type_gen #where_clause {
+                    fn query() -> String {
+                        String::new()
+                    }
+                }
+            };
+
+            // Hand the output tokens back to the compiler
+            return TokenStream::from(expanded)
+        }
         _ => unreachable!(),
     };
-    let (impl_gen, type_gen, where_clause) = input.generics.split_for_impl();
     // todo: validate against remote struct.
     let fields = m.fields.iter()
         .map(|f| {

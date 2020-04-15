@@ -25,12 +25,17 @@ use prisma_client_rs::\{Query, Queryable};
 // ====================== Enums ==========================
 
 {{- for enum in enums }}
-#[derive(Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Query)]
 pub enum {enum.name} \{
 	{{- for variant in enum.variants}}
 	#[serde(rename = "{variant.actual}")]
 	{variant.render},
 	{{- endfor}}
+}
+impl Default for {enum.name} \{
+    fn default() -> Self \{
+        {enum.name}::{enum.default}
+    }
 }
 {{- endfor }}
 
@@ -165,6 +170,7 @@ impl Prisma \{
     		{method.query | unescaped},
     	);
     	query.push_str("}");
+    	println!("query \{}", query);
     	let doc = gql::parse_query(&query)?;
     	let operation = convert(doc)?;
     	let schema = self.query_schema.clone();
