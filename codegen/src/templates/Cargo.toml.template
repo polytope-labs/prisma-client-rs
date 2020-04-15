@@ -21,4 +21,4 @@ query-connector = { git = "https://github.com/seunlanlege/prisma-engines", branc
 query-core = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
 prisma-models = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
 datamodel = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
-prisma-client-rs = { path = "../../../prisma-codegen-rs" }
+prisma-client-rs = { git = "https://github.com/seunlanlege/prisma-client-rs", branch = "master" }
