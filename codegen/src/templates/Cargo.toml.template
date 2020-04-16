@@ -23,3 +23,4 @@ prisma-models = { git = "https://github.com/seunlanlege/prisma-engines", branch 
 datamodel = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
 prisma-client-rs = { git = "https://github.com/seunlanlege/prisma-client-rs", branch = "master" }
 juniper = { git = "https://github.com/graphql-rust/juniper.git", rev = "adc8d7b" }
+futures = "0.3.4"
