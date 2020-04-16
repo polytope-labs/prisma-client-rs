@@ -12,6 +12,7 @@ use std::\{path::PathBuf, str::FromStr, collections::BTreeMap};
 use serde::\{de::DeserializeOwned, Serialize, Deserialize};
 mod serialize;
 use serialize::to_query_args;
+use juniper_codegen::GraphQLEnum;
 use sql_query_connector::\{Mysql, PostgreSql, Sqlite, FromSource};
 use query_connector::Connector;
 use graphql_parser::\{
@@ -25,7 +26,7 @@ use prisma_client_rs::\{Query, Queryable};
 // ====================== Enums ==========================
 
 {{- for enum in enums }}
-#[derive(Deserialize, Serialize, Debug, Query)]
+#[derive(Deserialize, Serialize, Debug, Query, GraphQLEnum)]
 pub enum {enum.name} \{
 	{{- for variant in enum.variants}}
 	#[serde(rename = "{variant.actual}")]
