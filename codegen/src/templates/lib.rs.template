@@ -26,7 +26,7 @@ use prisma_client_rs::\{Query, Queryable};
 // ====================== Enums ==========================
 
 {{- for enum in enums }}
-#[derive(Deserialize, Serialize, Debug, Query, GraphQLEnum)]
+#[derive(Clone, Deserialize, Serialize, Debug, Query, GraphQLEnum)]
 pub enum {enum.name} \{
 	{{- for variant in enum.variants}}
 	#[serde(rename = "{variant.actual}")]
@@ -44,7 +44,7 @@ impl Default for {enum.name} \{
 
 // ====================================== Input Types ===================================
 {{- for struct in inputs }}
-#[derive(Default, Serialize, Debug)]
+#[derive(Clone, Default, Serialize, Debug)]
 pub struct {struct.name} \{
     {{- for field in struct.fields}}
     {{- if field.is_required }}
@@ -60,7 +60,7 @@ pub struct {struct.name} \{
 
 // ====================================== Outpu Types ===================================
 {{- for struct in outputs }}
-#[derive(Default, Serialize, Deserialize, Debug, Query)]
+#[derive(Clone, Default, Serialize, Deserialize, Debug, Query)]
 pub struct {struct.name} \{
     {{- for field in struct.fields}}
     {{- if field.is_required }}
@@ -77,7 +77,7 @@ pub struct {struct.name} \{
 // ======================================= Argument Types ==========================================
 {{- for operation in operations }}
 {{- for struct in operation.outputs }}
-#[derive(Default, Serialize, Debug)]
+#[derive(Clone, Default, Serialize, Debug)]
 pub struct {struct.name} \{
     {{-for field in struct.fields}}
     {{-if field.is_required }}
