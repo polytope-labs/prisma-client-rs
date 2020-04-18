@@ -26,7 +26,7 @@ use prisma_client_rs::\{Query, Queryable};
 // ====================== Enums ==========================
 
 {{- for enum in enums }}
-#[derive(Clone, Deserialize, Serialize, Debug, Query, GraphQLEnum)]
+#[derive(Clone, PartialEq, Deserialize, Serialize, Debug, Query, GraphQLEnum)]
 pub enum {enum.name} \{
 	{{- for variant in enum.variants}}
 	#[serde(rename = "{variant.actual}")]
