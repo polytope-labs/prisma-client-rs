@@ -59,9 +59,9 @@ pub struct {struct.name} \{
 {{- endfor }}
 // ======================================================================================
 
-// ====================================== Outpu Types ===================================
+// ====================================== Output Types ===================================
 {{- for struct in outputs }}
-#[derive(Clone, Default, Serialize, Deserialize, Debug, Query)]
+#[derive(Clone, Serialize, Deserialize, Debug, Query)]
 pub struct {struct.name} \{
     {{- for field in struct.fields}}
     {{- if field.is_required }}
