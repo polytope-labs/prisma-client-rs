@@ -162,12 +162,12 @@ fn format_to_recursive_rust_type(name: &str, fields: &Vec<Field>, typ: &DMMFType
 		.collect::<Vec<_>>();
 	let formatted = match typ.typ.as_str() {
 		"Int" => "u64",
+		"DateTime" => "DateTime<Utc>",
 		_ => &typ.typ,
 	};
 
 	let formatted = match typ.kind{
 		TypeKind::Object if relations.len() > 0 => {
-			println!("name: {}, TypeKind::Object: {:?}", name, typ);
 			format!("Box<{}>", formatted)
 		}
 		_ => formatted.to_string()
@@ -190,6 +190,7 @@ fn format_to_recursive_rust_type(name: &str, fields: &Vec<Field>, typ: &DMMFType
 fn format_to_rust_type(typ: &DMMFTypeInfo) -> String {
 	let typ_name = match typ.typ.as_str() {
 		"Int" => "u64",
+		"DateTime" => "DateTime<Utc>",
 		_ => &typ.typ,
 	};
 

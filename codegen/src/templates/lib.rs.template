@@ -15,6 +15,7 @@ use serialize::to_query_args;
 use juniper::GraphQLEnum;
 use sql_query_connector::\{Mysql, PostgreSql, Sqlite, FromSource};
 use query_connector::Connector;
+use chrono::\{DateTime, Utc};
 use graphql_parser::\{
 	self as gql,
 	query::\{
