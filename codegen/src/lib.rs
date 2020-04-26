@@ -127,7 +127,7 @@ fn generate_client(model_str: &str) -> String {
 						"name": json!({
 							"render": field.name.to_snake_case(),
 							"actual": field.name,
-						})
+						}),
 						"type": format_to_rust_type(&field.output_type),
 					})
 				})
