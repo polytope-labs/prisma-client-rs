@@ -3,9 +3,16 @@
 /// We re-export them under one crate
 pub use prisma_codegen::generate;
 pub use prisma_derive::Query;
+use chrono::{DateTime, Utc};
 
 pub trait Queryable {
 	fn query() -> String;
+}
+
+impl Queryable for DateTime<Utc> {
+	fn query() -> String {
+		String::new()
+	}
 }
 
 impl<T: Queryable> Queryable for Vec<T> {

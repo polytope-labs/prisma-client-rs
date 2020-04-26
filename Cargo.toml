@@ -15,5 +15,6 @@ members = [
 path = "lib.rs"
 
 [dependencies]
+chrono = "0.4.11"
 prisma-codegen = { path = "./codegen" }
 prisma-derive = { path = "./derive" }
