@@ -68,7 +68,8 @@ pub struct {struct.name} \{
     {{- else }}
     #[serde(skip_serializing_if = "Option::is_none")]
     {{- endif }}
-    pub {field.name}: {field.type | unescaped},
+    #[serde(rename = "{field.name.actual}")]
+    pub {field.name.render}: {field.type | unescaped},
     {{- endfor }}
 }
 {{- endfor }}

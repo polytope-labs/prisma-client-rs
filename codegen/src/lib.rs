@@ -124,7 +124,10 @@ fn generate_client(model_str: &str) -> String {
 				.map(|field| {
 					json!({
 						"is_required": field.output_type.is_required,
-						"name": field.name,
+						"name": json!({
+							"render": field.name.to_snake_case(),
+							"actual": field.name,
+						})
 						"type": format_to_rust_type(&field.output_type),
 					})
 				})
