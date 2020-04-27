@@ -1,5 +1,5 @@
 [package]
-name = "prisma"
+name = "prisma-client-rs"
 version = "0.1.0"
 authors = ["Seun Lanlege <seunlanlege@gmail.com>"]
 edition = "2018"
