@@ -128,7 +128,7 @@ fn generate_client(model_str: &str) -> String {
 							"render": field.name.to_snake_case(),
 							"actual": field.name,
 						}),
-						"type": format_to_rust_type(&field.output_type),
+						"type": format_to_recursive_rust_type(&field.name, &models, &field.output_type),
 					})
 				})
 				.collect::<Vec<_>>();
@@ -166,6 +166,7 @@ fn format_to_recursive_rust_type(name: &str, fields: &Vec<Field>, typ: &DMMFType
 	let formatted = match typ.typ.as_str() {
 		"Int" => "u64",
 		"DateTime" => "DateTime<Utc>",
+		"Boolean" => "bool",
 		_ => &typ.typ,
 	};
 
@@ -194,6 +195,7 @@ fn format_to_rust_type(typ: &DMMFTypeInfo) -> String {
 	let typ_name = match typ.typ.as_str() {
 		"Int" => "u64",
 		"DateTime" => "DateTime<Utc>",
+		"Boolean" => "bool",
 		_ => &typ.typ,
 	};
 
