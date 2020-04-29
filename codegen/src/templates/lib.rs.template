@@ -10,8 +10,6 @@ use prisma_models::DatamodelConverter;
 use std::\{sync::Arc, collections::HashMap};
 use std::\{path::PathBuf, str::FromStr, collections::BTreeMap};
 use serde::\{de::DeserializeOwned, Serialize, Deserialize};
-mod serialize;
-use serialize::to_query_args;
 use juniper::GraphQLEnum;
 use sql_query_connector::\{Mysql, PostgreSql, Sqlite, FromSource};
 use query_connector::Connector;
@@ -22,7 +20,7 @@ use graphql_parser::\{
 		Definition, Document, OperationDefinition, Selection as GqlSelection, SelectionSet, Value,
 	}
 };
-use prisma_client_rs::\{Query, Queryable};
+use prisma_client_rs::\{Query, Queryable, to_query_args};
 
 // ====================== Enums ==========================
 

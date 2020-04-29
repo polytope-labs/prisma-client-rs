@@ -1,10 +1,48 @@
-/// Prisma Client.
+///! Prisma Client.
 ///
 /// We re-export them under one crate
 pub use prisma_codegen::generate;
 pub use prisma_derive::Query;
 use chrono::{DateTime, Utc};
 
+mod serialization;
+/// Qraphql inline-argument serialization.
+///
+/// this is entirely for serializing Structs to strings that can be inserted into a graphql query.
+///
+/// imagine
+///
+/// ```rust
+/// use prisma_client_rs::to_query_args;
+/// #[derive(Serialize)]
+/// struct User {
+///     id: String,
+///     name: String
+/// }
+///
+/// to_query_args(&User { id: "28375fb6gsd".into(), name: "Seun Lanlege".into() });
+/// ```
+/// This produces `{ id: "28375fb6gsd", name: "Seun Lanlege" }`
+///
+/// notice the lack of surrounding quotes of Object keys.
+pub use serialization::{to_query_args, Error};
+
+
+/// This allows objects(structs) desrbibe what data they want want from the db.
+///
+/// ideally end users aren't deriving this directly, they're using the derive proc macro `Query`.
+///
+/// ```rust
+/// #[derive(Query)]
+/// struct User {
+/// 	id: String,
+/// 	name: String
+/// }
+///
+/// User::query();
+/// ```
+/// Produces `{ id name }`, this is interpolated into a graphql query.
+///
 pub trait Queryable {
 	fn query() -> String;
 }
