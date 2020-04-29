@@ -104,3 +104,9 @@ impl Queryable for String {
 		String::new()
 	}
 }
+
+impl Queryable for bool {
+	fn query() -> String {
+		String::new()
+	}
+}
