@@ -22,10 +22,6 @@ pub fn generate(datamodel: &str, out_dir: &str) {
 		include_str!("templates/Cargo.toml.template")
 	).unwrap();
 	fs::write(
-		out_dir.join("prisma-client/src/serialize.rs"),
-		include_str!("templates/serialization.rs.template")
-	).unwrap();
-	fs::write(
 		out_dir.join("prisma-client/src/lib.rs"),
 		generate_client(&model)
 	).unwrap();
