@@ -20,6 +20,6 @@ query-connector = { git = "https://github.com/seunlanlege/prisma-engines", branc
 query-core = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
 prisma-models = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
 datamodel = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
-prisma-client-rs = { git = "https://github.com/seunlanlege/prisma-client-rs", rev = "0973e9f" }
+prisma-client-rs = { git = "https://github.com/seunlanlege/prisma-client-rs", rev = "86d0ebc" }
 juniper = { git = "https://github.com/graphql-rust/juniper.git", rev = "c761d91" }
 futures = "0.3.4"
