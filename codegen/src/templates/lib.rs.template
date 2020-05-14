@@ -171,8 +171,8 @@ impl Prisma \{
     		{method.query | unescaped},
     	);
     	query.push_str("}");
-    	println!("query \{}", query);
     	let doc = gql::parse_query(&query)?;
+    	log::debug!("\n\{}", doc);
     	let operation = convert(doc)?;
     	let schema = self.query_schema.clone();
     	let response = self.executor.execute(operation, schema).await?;
