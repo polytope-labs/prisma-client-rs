@@ -148,7 +148,7 @@ fn generate_client(model_str: &str) -> String {
 }
 
 
-/// converts DMMFTypeInfo to a rust type.
+/// converts DMMFTypeInfo to a rust type
 fn format_to_recursive_rust_type(name: &str, fields: &Vec<Field>, typ: &DMMFTypeInfo) -> String {
 	let relations = fields.iter()
 		.filter_map(|f| {
