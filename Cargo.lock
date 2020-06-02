@@ -1702,9 +1702,8 @@ dependencies = [
  "itoa",
  "juniper",
  "log",
- "prisma-client-rs",
- "prisma-codegen 0.1.0",
- "prisma-derive 0.1.0",
+ "prisma-codegen",
+ "prisma-derive",
  "prisma-models",
  "query-connector",
  "query-core",
@@ -1717,35 +1716,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "prisma-client-rs"
-version = "0.1.0"
-source = "git+https://github.com/seunlanlege/prisma-client-rs#f943da6759c04e0ec9d8a6a5fc88e94266504427"
-dependencies = [
- "chrono",
- "derive_more",
- "itoa",
- "prisma-codegen 0.1.0 (git+https://github.com/seunlanlege/prisma-client-rs)",
- "prisma-derive 0.1.0 (git+https://github.com/seunlanlege/prisma-client-rs)",
- "ryu",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "prisma-codegen"
-version = "0.1.0"
-source = "git+https://github.com/seunlanlege/prisma-client-rs#f943da6759c04e0ec9d8a6a5fc88e94266504427"
-dependencies = [
- "Inflector",
- "datamodel",
- "prisma-models",
- "query-core",
- "query-engine",
- "serde_json",
- "tinytemplate",
-]
-
-[[package]]
 name = "prisma-codegen"
 version = "0.1.0"
 dependencies = [
@@ -1756,15 +1726,6 @@ dependencies = [
  "query-engine",
  "serde_json",
  "tinytemplate",
-]
-
-[[package]]
-name = "prisma-derive"
-version = "0.1.0"
-source = "git+https://github.com/seunlanlege/prisma-client-rs#f943da6759c04e0ec9d8a6a5fc88e94266504427"
-dependencies = [
- "quote 1.0.6",
- "syn 1.0.29",
 ]
 
 [[package]]

@@ -2,6 +2,7 @@
 ///
 /// We re-export them under one crate
 pub use prisma_derive::Query;
+use prisma_derive::QueryInternal;
 use chrono::{DateTime, Utc};
 
 include!(concat!(env!("OUT_DIR"), "/prisma.rs"));

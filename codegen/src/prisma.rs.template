@@ -23,7 +23,7 @@ use graphql_parser::\{
 // ====================== Enums ==========================
 
 {{- for enum in enums }}
-#[derive(Clone, PartialEq, Deserialize, Serialize, Debug, Query, GraphQLEnum)]
+#[derive(Clone, PartialEq, Deserialize, Serialize, Debug, QueryInternal, GraphQLEnum)]
 pub enum {enum.name} \{
 	{{- for variant in enum.variants}}
 	#[serde(rename = "{variant.actual}")]
@@ -57,7 +57,7 @@ pub struct {struct.name} \{
 
 // ====================================== Output Types ===================================
 {{- for struct in outputs }}
-#[derive(Clone, Serialize, Deserialize, Debug, Query)]
+#[derive(Clone, Serialize, Deserialize, Debug, QueryInternal)]
 pub struct {struct.name} \{
     {{- for field in struct.fields}}
     {{- if field.is_required }}
