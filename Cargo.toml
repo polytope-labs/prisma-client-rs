@@ -1,5 +1,5 @@
 [package]
-name = "prisma-client-rs"
+name = "prisma"
 version = "0.1.0"
 authors = ["Seun Lanlege <seunlanlege@gmail.com>"]
 edition = "2018"
@@ -13,6 +13,10 @@ members = [
 [lib]
 path = "lib.rs"
 
+[build-dependencies]
+prisma-codegen = { path = "./codegen" }
+
+
 [dependencies]
 serde_json = "1.0.50"
 serde = { version = "1.0.106", features = ["serde_derive"] }
@@ -20,5 +24,17 @@ derive_more = "0.99.5"
 itoa = "0.4.5"
 chrono = "0.4"
 ryu = "1.0.3"
-prisma-codegen = { path = "./codegen" }
 prisma-derive = { path = "./derive" }
+rust_decimal = "=1.1.0"
+log = "0.4.8"
+url = "2.1.1"
+graphql-parser = "0.3.0"
+Inflector = "0.11"
+# prisma dependecies
+sql-query-connector = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
+query-connector = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
+query-core = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
+prisma-models = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
+datamodel = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
+juniper = { git = "https://github.com/graphql-rust/juniper.git", rev = "c761d91" }
+futures = "0.3.4"

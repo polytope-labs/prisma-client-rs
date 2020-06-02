@@ -1,30 +1,23 @@
-use std::{fs, path::PathBuf};
+use std::{fs, path::{PathBuf, Path}};
 use datamodel::parse_datamodel;
 use query_engine::dmmf::{render_dmmf, schema::{DMMFTypeInfo, DMMFOutputType}};
 use query_core::{SupportedCapabilities, QuerySchemaBuilder, BuildMode};
 use prisma_models::DatamodelConverter;
-use std::sync::Arc;
+use std::{sync::Arc, env};
 use inflector::Inflector;
 use serde_json::{json, Value};
 use query_engine::dmmf::schema::TypeKind;
 use prisma_models::dml::Field;
 
 /// Generates the client.
-pub fn generate(datamodel: &str, out_dir: &str) {
-	// todo: mechanism for checking if model file has changed
+pub fn generate(datamodel: &str) {
 	let model = fs::read_to_string(PathBuf::from(datamodel))
 		.expect("failed to read .prisma file");
 
-	let out_dir = PathBuf::from(out_dir);
-	fs::create_dir_all(out_dir.join("prisma-client/src")).unwrap();
-	fs::write(
-		out_dir.join("prisma-client/Cargo.toml"),
-		include_str!("templates/Cargo.toml.template")
-	).unwrap();
-	fs::write(
-		out_dir.join("prisma-client/src/lib.rs"),
-		generate_client(&model)
-	).unwrap();
+	let out_dir = env::var_os("OUT_DIR").unwrap();
+	let out_dir = Path::new(&out_dir);
+	fs::write(out_dir.join("prisma.rs"), generate_client(&model))
+		.expect("Error while writing to prisma.rs");
 }
 
 fn generate_client(model_str: &str) -> String {
@@ -40,7 +33,7 @@ fn generate_client(model_str: &str) -> String {
 	let query_schema = Arc::new(schema_builder.build());
 	let dmmf = render_dmmf(&model, query_schema);
 	let mut tt = tinytemplate::TinyTemplate::new();
-	tt.add_template("client", include_str!("./templates/lib.rs.template")).unwrap();
+	tt.add_template("client", include_str!("./prisma.rs.template")).unwrap();
 	let models = model.models.into_iter()
 		.map(|m| {
 			m.fields.into_iter()
@@ -326,7 +319,7 @@ fn format_method_name(name: String) -> String {
 mod test {
 	#[test]
 	fn generate_client() {
-		let out = super::generate_client(r##"datasource pg {
+		let _ = super::generate_client(r##"datasource pg {
 	provider = "mysql"
 	url = "mysql://root:prisma@localhost:3306/default@default"
 }

@@ -1,11 +1,11 @@
 ///! Prisma Client.
 ///
 /// We re-export them under one crate
-pub use prisma_codegen::generate;
 pub use prisma_derive::Query;
 use chrono::{DateTime, Utc};
 
-mod serialization;
+include!(concat!(env!("OUT_DIR"), "/prisma.rs"));
+
 /// Qraphql inline-argument serialization.
 ///
 /// this is entirely for serializing Structs to strings that can be inserted into a graphql query.
@@ -25,8 +25,8 @@ mod serialization;
 /// This produces `{ id: "28375fb6gsd", name: "Seun Lanlege" }`
 ///
 /// notice the lack of surrounding quotes of Object keys.
-pub use serialization::{to_query_args, Error};
-
+pub mod serialization;
+pub use serialization::to_query_args;
 
 /// This allows objects(structs) desrbibe what data they want want from the db.
 ///

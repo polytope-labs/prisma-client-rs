@@ -13,14 +13,12 @@ use serde::\{de::DeserializeOwned, Serialize, Deserialize};
 use juniper::GraphQLEnum;
 use sql_query_connector::\{Mysql, PostgreSql, Sqlite, FromSource};
 use query_connector::Connector;
-use chrono::\{DateTime, Utc};
 use graphql_parser::\{
 	self as gql,
 	query::\{
 		Definition, Document, OperationDefinition, Selection as GqlSelection, SelectionSet, Value,
 	}
 };
-use prisma_client_rs::\{Query, Queryable, to_query_args};
 
 // ====================== Enums ==========================
 
