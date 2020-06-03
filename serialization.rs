@@ -22,6 +22,7 @@ struct QueryArgumentSerializer {
 	writer: Vec<u8>,
 }
 
+/// Serialization Errors
 #[derive(derive_more::From, derive_more::Display, Debug)]
 pub enum Error {
 	KeyMustBeAString,
@@ -376,7 +377,7 @@ impl<'a> Serializer for &'a mut QueryArgumentSerializer {
 // Not public API. Should be pub(crate).
 #[doc(hidden)]
 #[derive(Eq, PartialEq)]
-pub enum State {
+enum State {
 	Empty,
 	First,
 	Rest,
@@ -384,7 +385,7 @@ pub enum State {
 
 // Not public API. Should be pub(crate).
 #[doc(hidden)]
-pub struct Compound<'a> {
+struct Compound<'a> {
 	ser: &'a mut QueryArgumentSerializer,
 	state: State,
 }
@@ -776,7 +777,7 @@ impl<'a> ser::Serializer for MapKeySerializer<'a> {
 
 /// Writes a `null` value to the specified writer.
 #[inline]
-pub fn write_null<W>(writer: &mut W) -> io::Result<()>
+fn write_null<W>(writer: &mut W) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -785,7 +786,7 @@ pub fn write_null<W>(writer: &mut W) -> io::Result<()>
 
 /// Writes a `true` or `false` value to the specified writer.
 #[inline]
-pub fn write_bool<W>(writer: &mut W, value: bool) -> io::Result<()>
+fn write_bool<W>(writer: &mut W, value: bool) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -799,7 +800,7 @@ pub fn write_bool<W>(writer: &mut W, value: bool) -> io::Result<()>
 
 /// Writes an integer value like `-123` to the specified writer.
 #[inline]
-pub fn write_i8<W>(writer: &mut W, value: i8) -> io::Result<()>
+fn write_i8<W>(writer: &mut W, value: i8) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -810,7 +811,7 @@ pub fn write_i8<W>(writer: &mut W, value: i8) -> io::Result<()>
 
 /// Writes an integer value like `-123` to the specified writer.
 #[inline]
-pub fn write_i16<W>(writer: &mut W, value: i16) -> io::Result<()>
+fn write_i16<W>(writer: &mut W, value: i16) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -821,7 +822,7 @@ pub fn write_i16<W>(writer: &mut W, value: i16) -> io::Result<()>
 
 /// Writes an integer value like `-123` to the specified writer.
 #[inline]
-pub fn write_i32<W>(writer: &mut W, value: i32) -> io::Result<()>
+fn write_i32<W>(writer: &mut W, value: i32) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -832,7 +833,7 @@ pub fn write_i32<W>(writer: &mut W, value: i32) -> io::Result<()>
 
 /// Writes an integer value like `-123` to the specified writer.
 #[inline]
-pub fn write_i64<W>(writer: &mut W, value: i64) -> io::Result<()>
+fn write_i64<W>(writer: &mut W, value: i64) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -843,7 +844,7 @@ pub fn write_i64<W>(writer: &mut W, value: i64) -> io::Result<()>
 
 /// Writes an integer value like `123` to the specified writer.
 #[inline]
-pub fn write_u8<W>(writer: &mut W, value: u8) -> io::Result<()>
+fn write_u8<W>(writer: &mut W, value: u8) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -854,7 +855,7 @@ pub fn write_u8<W>(writer: &mut W, value: u8) -> io::Result<()>
 
 /// Writes an integer value like `123` to the specified writer.
 #[inline]
-pub fn write_u16<W>(writer: &mut W, value: u16) -> io::Result<()>
+fn write_u16<W>(writer: &mut W, value: u16) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -865,7 +866,7 @@ pub fn write_u16<W>(writer: &mut W, value: u16) -> io::Result<()>
 
 /// Writes an integer value like `123` to the specified writer.
 #[inline]
-pub fn write_u32<W>(writer: &mut W, value: u32) -> io::Result<()>
+fn write_u32<W>(writer: &mut W, value: u32) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -876,7 +877,7 @@ pub fn write_u32<W>(writer: &mut W, value: u32) -> io::Result<()>
 
 /// Writes an integer value like `123` to the specified writer.
 #[inline]
-pub fn write_u64<W>(writer: &mut W, value: u64) -> io::Result<()>
+fn write_u64<W>(writer: &mut W, value: u64) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -887,7 +888,7 @@ pub fn write_u64<W>(writer: &mut W, value: u64) -> io::Result<()>
 
 /// Writes a floating point value like `-31.26e+12` to the specified writer.
 #[inline]
-pub fn write_f32<W>(writer: &mut W, value: f32) -> io::Result<()>
+fn write_f32<W>(writer: &mut W, value: f32) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -898,7 +899,7 @@ pub fn write_f32<W>(writer: &mut W, value: f32) -> io::Result<()>
 
 /// Writes a floating point value like `-31.26e+12` to the specified writer.
 #[inline]
-pub fn write_f64<W>(writer: &mut W, value: f64) -> io::Result<()>
+fn write_f64<W>(writer: &mut W, value: f64) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -909,7 +910,7 @@ pub fn write_f64<W>(writer: &mut W, value: f64) -> io::Result<()>
 
 /// Writes a number that has already been rendered to a string.
 #[inline]
-pub fn write_number_str<W>(writer: &mut W, value: &str) -> io::Result<()>
+fn write_number_str<W>(writer: &mut W, value: &str) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -919,7 +920,7 @@ pub fn write_number_str<W>(writer: &mut W, value: &str) -> io::Result<()>
 /// Called before each series of `write_string_fragment` and
 /// `write_char_escape`.  Writes a `"` to the specified writer.
 #[inline]
-pub fn begin_string<W>(writer: &mut W) -> io::Result<()>
+fn begin_string<W>(writer: &mut W) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -929,7 +930,7 @@ pub fn begin_string<W>(writer: &mut W) -> io::Result<()>
 /// Called after each series of `write_string_fragment` and
 /// `write_char_escape`.  Writes a `"` to the specified writer.
 #[inline]
-pub fn end_string<W>(writer: &mut W) -> io::Result<()>
+fn end_string<W>(writer: &mut W) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -939,7 +940,7 @@ pub fn end_string<W>(writer: &mut W) -> io::Result<()>
 /// Writes a string fragment that doesn't need any escaping to the
 /// specified writer.
 #[inline]
-pub fn write_string_fragment<W>(writer: &mut W, fragment: &str) -> io::Result<()>
+fn write_string_fragment<W>(writer: &mut W, fragment: &str) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -948,7 +949,7 @@ pub fn write_string_fragment<W>(writer: &mut W, fragment: &str) -> io::Result<()
 
 
 /// Represents a character escape code in a type-safe manner.
-pub enum CharEscape {
+enum CharEscape {
 	/// An escaped quote `"`
 	Quote,
 	/// An escaped reverse solidus `\`
@@ -970,7 +971,7 @@ pub enum CharEscape {
 
 impl CharEscape {
 	#[inline]
-	pub fn from_escape_table(escape: u8, byte: u8) -> CharEscape {
+	fn from_escape_table(escape: u8, byte: u8) -> CharEscape {
 		match escape {
 			self::BB => CharEscape::Backspace,
 			self::TT => CharEscape::Tab,
@@ -986,19 +987,19 @@ impl CharEscape {
 }
 
 
-pub const BB: u8 = b'b'; // \x08
-pub const TT: u8 = b't'; // \x09
-pub const NN: u8 = b'n'; // \x0A
-pub const FF: u8 = b'f'; // \x0C
-pub const RR: u8 = b'r'; // \x0D
-pub const QU: u8 = b'"'; // \x22
-pub const BS: u8 = b'\\'; // \x5C
-pub const UU: u8 = b'u'; // \x00...\x1F except the ones above
-pub const __: u8 = 0;
+const BB: u8 = b'b'; // \x08
+const TT: u8 = b't'; // \x09
+const NN: u8 = b'n'; // \x0A
+const FF: u8 = b'f'; // \x0C
+const RR: u8 = b'r'; // \x0D
+const QU: u8 = b'"'; // \x22
+const BS: u8 = b'\\'; // \x5C
+const UU: u8 = b'u'; // \x00...\x1F except the ones above
+const __: u8 = 0;
 
 // Lookup table of escape sequences. A value of b'x' at index i means that byte
 // i is escaped as "\x" in JSON. A value of 0 means that byte i is not escaped.
-pub static ESCAPE: [u8; 256] = [
+static ESCAPE: [u8; 256] = [
 	//   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 	UU, UU, UU, UU, UU, UU, UU, UU, BB, TT, NN, UU, FF, RR, UU, UU, // 0
 	UU, UU, UU, UU, UU, UU, UU, UU, UU, UU, UU, UU, UU, UU, UU, UU, // 1
@@ -1021,7 +1022,7 @@ pub static ESCAPE: [u8; 256] = [
 
 /// Writes a character escape code to the specified writer.
 #[inline]
-pub fn write_char_escape<W>(writer: &mut W, char_escape: CharEscape) -> io::Result<()>
+fn write_char_escape<W>(writer: &mut W, char_escape: CharEscape) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -1055,7 +1056,7 @@ pub fn write_char_escape<W>(writer: &mut W, char_escape: CharEscape) -> io::Resu
 /// Called before every array.  Writes a `[` to the specified
 /// writer.
 #[inline]
-pub fn begin_array<W>(writer: &mut W) -> io::Result<()>
+fn begin_array<W>(writer: &mut W) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -1065,7 +1066,7 @@ pub fn begin_array<W>(writer: &mut W) -> io::Result<()>
 /// Called after every array.  Writes a `]` to the specified
 /// writer.
 #[inline]
-pub fn end_array<W>(writer: &mut W) -> io::Result<()>
+fn end_array<W>(writer: &mut W) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -1075,7 +1076,7 @@ pub fn end_array<W>(writer: &mut W) -> io::Result<()>
 /// Called before every array value.  Writes a `,` if needed to
 /// the specified writer.
 #[inline]
-pub fn begin_array_value<W>(writer: &mut W, first: bool) -> io::Result<()>
+fn begin_array_value<W>(writer: &mut W, first: bool) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -1088,7 +1089,7 @@ pub fn begin_array_value<W>(writer: &mut W, first: bool) -> io::Result<()>
 
 /// Called after every array value.
 #[inline]
-pub fn end_array_value<W>(_: &mut W) -> io::Result<()>
+fn end_array_value<W>(_: &mut W) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -1098,7 +1099,7 @@ pub fn end_array_value<W>(_: &mut W) -> io::Result<()>
 /// Called before every object.  Writes a `{` to the specified
 /// writer.
 #[inline]
-pub fn begin_object<W>(writer: &mut W) -> io::Result<()>
+fn begin_object<W>(writer: &mut W) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -1108,7 +1109,7 @@ pub fn begin_object<W>(writer: &mut W) -> io::Result<()>
 /// Called after every object.  Writes a `}` to the specified
 /// writer.
 #[inline]
-pub fn end_object<W>(writer: &mut W) -> io::Result<()>
+fn end_object<W>(writer: &mut W) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -1117,7 +1118,7 @@ pub fn end_object<W>(writer: &mut W) -> io::Result<()>
 
 /// Called before every object key.
 #[inline]
-pub fn begin_object_key<W>(writer: &mut W, first: bool) -> io::Result<()>
+fn begin_object_key<W>(writer: &mut W, first: bool) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -1132,7 +1133,7 @@ pub fn begin_object_key<W>(writer: &mut W, first: bool) -> io::Result<()>
 /// specified writer by either this method or
 /// `begin_object_value`.
 #[inline]
-pub fn end_object_key<W>(_: &mut W) -> io::Result<()>
+fn end_object_key<W>(_: &mut W) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -1143,7 +1144,7 @@ pub fn end_object_key<W>(_: &mut W) -> io::Result<()>
 /// the specified writer by either this method or
 /// `end_object_key`.
 #[inline]
-pub fn begin_object_value<W>(writer: &mut W) -> io::Result<()>
+fn begin_object_value<W>(writer: &mut W) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -1152,7 +1153,7 @@ pub fn begin_object_value<W>(writer: &mut W) -> io::Result<()>
 
 /// Called after every object value.
 #[inline]
-pub fn end_object_value<W>(_: &mut W) -> io::Result<()>
+fn end_object_value<W>(_: &mut W) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -1160,7 +1161,7 @@ pub fn end_object_value<W>(_: &mut W) -> io::Result<()>
 }
 
 
-pub fn format_escaped_str<W>(writer: &mut W, value: &str) -> io::Result<()>
+fn format_escaped_str<W>(writer: &mut W, value: &str) -> io::Result<()>
 	where
 		W: ?Sized + io::Write,
 {
@@ -1170,7 +1171,7 @@ pub fn format_escaped_str<W>(writer: &mut W, value: &str) -> io::Result<()>
 	Ok(())
 }
 
-pub fn format_escaped_str_contents<W>(
+fn format_escaped_str_contents<W>(
 	writer: &mut W,
 	value: &str,
 ) -> io::Result<()>
