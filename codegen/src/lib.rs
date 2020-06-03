@@ -153,7 +153,9 @@ fn format_to_recursive_rust_type(name: &str, fields: &Vec<Field>, typ: &DMMFType
 		})
 		.collect::<Vec<_>>();
 	let formatted = match typ.typ.as_str() {
-		"Int" => "u64",
+		// graphql scalar types.
+		"Int" => "i32",
+		"Float" => "f64",
 		"DateTime" => "DateTime<Utc>",
 		"Boolean" => "bool",
 		_ => &typ.typ,
@@ -182,7 +184,9 @@ fn format_to_recursive_rust_type(name: &str, fields: &Vec<Field>, typ: &DMMFType
 /// converts DMMFTypeInfo to a rust type.
 fn format_to_rust_type(typ: &DMMFTypeInfo) -> String {
 	let typ_name = match typ.typ.as_str() {
-		"Int" => "u64",
+		// graphql scalar types.
+		"Int" => "i32",
+		"Float" => "f64",
 		"DateTime" => "DateTime<Utc>",
 		"Boolean" => "bool",
 		_ => &typ.typ,
