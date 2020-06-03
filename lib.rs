@@ -1,9 +1,5 @@
 ///
-pub use prisma_derive::Query;
-use prisma_derive::QueryInternal;
 use chrono::{DateTime, Utc};
-
-include!(concat!(env!("OUT_DIR"), "/prisma.rs"));
 
 /// Graphql inline-argument serialization.
 ///
@@ -25,8 +21,10 @@ include!(concat!(env!("OUT_DIR"), "/prisma.rs"));
 ///
 /// notice the lack of surrounding quotes of Object keys.
 mod serialization;
-/// Graphql inline-argument serialization.
-use serialization::to_query_args;
+mod prisma;
+pub use prisma::*;
+pub use prisma_derive::Query;
+
 
 /// This allows objects(structs) describe what data they want want from the db.
 ///
