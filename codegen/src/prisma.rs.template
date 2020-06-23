@@ -181,7 +181,7 @@ impl Prisma \{
     	let response = self.executor.execute(operation, schema).await?;
 
     	// serialize from map to Queryable.
-    	let value = serde_json::to_value(&response.data.into_map().unwrap().get("{method.data_name}").unwrap())
+    	let value = serde_json::to_value(&response.data)
     		.expect("Deserializing to serde_json::Value should be infallible");
     	let data = serde_json::from_value(value)
     		.expect("Validation is done by prisma_client_derive::Queryable, this is infallible");
