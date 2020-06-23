@@ -99,6 +99,8 @@ pub struct Prisma \{
 
 impl Prisma \{
 	pub async fn init(force_transactions: bool) -> Result<Self, Error> \{
+	let _ = feature_flags::initialize(&vec![String::from("all")]);
+
 		let datamodel_str = r###"{datamodel | unescaped}"###;
 		let config = parse_configuration(datamodel_str).unwrap();
 		let source = config.datasources.first()
@@ -177,13 +179,9 @@ impl Prisma \{
     	let operation = convert(doc)?;
     	let schema = self.query_schema.clone();
     	let response = self.executor.execute(operation, schema).await?;
-    	if response.errors.len() > 0 \{
-    	    // return the errors.
-    	    todo!("proper error")
-    	}
 
     	// serialize from map to Queryable.
-    	let value = serde_json::to_value(&response.data.get("{method.data_name}").unwrap())
+    	let value = serde_json::to_value(&response.data.into_map().unwrap().get("{method.data_name}").unwrap())
     		.expect("Deserializing to serde_json::Value should be infallible");
     	let data = serde_json::from_value(value)
     		.expect("Validation is done by prisma_client_derive::Queryable, this is infallible");

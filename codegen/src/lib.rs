@@ -52,6 +52,7 @@ pub fn generate(datamodel: &str) {
 }
 
 fn generate_client(model_str: &str) -> String {
+	let _ = feature_flags::initialize(&vec![String::from("all")]);
     let model = parse_datamodel(model_str).unwrap();
     let internal_model = DatamodelConverter::convert(&model).build("".into());
     let cap = SupportedCapabilities::empty();

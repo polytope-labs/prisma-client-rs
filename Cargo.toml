@@ -32,6 +32,7 @@ Inflector = "0.11"
 # prisma dependecies
 sql-query-connector = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
 query-connector = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
+feature-flags = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
 query-core = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
 prisma-models = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
 datamodel = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }

@@ -5,6 +5,7 @@ authors = ["Seun <seunlanlege@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+feature-flags = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
 query-core = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
 query-engine = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
 prisma-models = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
