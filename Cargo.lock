@@ -1724,6 +1724,7 @@ dependencies = [
  "prisma-models",
  "query-core",
  "query-engine",
+ "serde",
  "serde_json",
  "tinytemplate",
 ]

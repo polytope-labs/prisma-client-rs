@@ -85,7 +85,7 @@ pub struct {struct.name} \{
     {{- else }}
     #[serde(skip_serializing_if = "Option::is_none")]
     {{- endif }}
-    pub {field.name_filtered}: {field.type | unescaped},
+    pub {field.name.render}: {field.type | unescaped},
     {{-endfor}}
 }
 {{- endfor }}
@@ -132,32 +132,32 @@ impl Prisma \{
     	let mut operation_args = String::new();
 
         {{- for arg in method.args }}
-    	{{- if arg.only }}
+    	{{- if method.only }}
     	{{- if not arg.is_required }}
-        if {arg.name_filtered}.is_some() \{
+        if {arg.name.render}.is_some() \{
         	operation_args.push_str(&format!(
-        		"{arg.name}: \{},",
-        		to_query_args({arg.name_filtered}.as_ref().unwrap()).unwrap()
+        		"{arg.name.actual}: \{},",
+        		to_query_args({arg.name.render}.as_ref().unwrap()).unwrap()
         	));
         }
         {{- else }}
         operation_args.push_str(&format!(
-        	"{arg.name}: \{},",
-        	to_query_args({arg.name_filtered}).unwrap()
+        	"{arg.name.actual}: \{},",
+        	to_query_args({arg.name.render}).unwrap()
         ));
         {{- endif }}
     	{{- else }}
     	{{- if not arg.is_required }}
-        if data.{arg.name_filtered}.is_some() \{
+        if data.{arg.name.render}.is_some() \{
         	operation_args.push_str(&format!(
-        		"{arg.name}: \{},",
-        		to_query_args(data.{arg.name_filtered}.as_ref().unwrap()).unwrap()
+        		"{arg.name.actual}: \{},",
+        		to_query_args(data.{arg.name.render}.as_ref().unwrap()).unwrap()
         	));
         }
         {{- else }}
         operation_args.push_str(&format!(
-        	"{arg.name}: \{},",
-        	to_query_args(&data.{arg.name_filtered}).unwrap()
+        	"{arg.name.actual}: \{},",
+        	to_query_args(&data.{arg.name.render}).unwrap()
         ));
         {{- endif }}
     	{{- endif }}
@@ -183,7 +183,7 @@ impl Prisma \{
     	}
 
     	// serialize from map to Queryable.
-    	let value = serde_json::to_value(&response.data.get("{method.query_name}").unwrap())
+    	let value = serde_json::to_value(&response.data.get("{method.data_name}").unwrap())
     		.expect("Deserializing to serde_json::Value should be infallible");
     	let data = serde_json::from_value(value)
     		.expect("Validation is done by prisma_client_derive::Queryable, this is infallible");
