@@ -10,11 +10,7 @@ use query_engine::dmmf::{
 };
 use serde::Serialize;
 use serde_json::{json, Value};
-use std::{env, sync::Arc};
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
+use std::{fs, path::PathBuf, sync::Arc};
 
 #[derive(Debug, Serialize, Clone)]
 struct TypeName {
@@ -42,18 +38,16 @@ struct Type {
 }
 
 /// Generates the client.
-pub fn generate(datamodel: &str) {
-    let model = fs::read_to_string(PathBuf::from(datamodel)).expect("failed to read .prisma file");
-
-    let out_dir = env::var_os("OUT_DIR").unwrap();
-    let out_dir = Path::new(&out_dir);
-    fs::write(out_dir.join("prisma.rs"), generate_client(&model))
+pub fn write_to_dir(datamodel: &str, path: PathBuf) {
+	let model_str = fs::read_to_string(PathBuf::from(datamodel))
+		.expect("failed to read .prisma file");
+    fs::write(path, generate(&model_str))
         .expect("Error while writing to prisma.rs");
 }
 
-fn generate_client(model_str: &str) -> String {
+fn generate(model_str: &str) -> String {
 	let _ = feature_flags::initialize(&vec![String::from("all")]);
-    let model = parse_datamodel(model_str).unwrap();
+    let model = parse_datamodel(&model_str).unwrap();
     let internal_model = DatamodelConverter::convert(&model).build("".into());
     let cap = SupportedCapabilities::empty();
     let schema_builder = QuerySchemaBuilder::new(&internal_model, &cap, BuildMode::Modern, false);
@@ -404,15 +398,17 @@ fn format_method_name(name: String) -> String {
 mod test {
     #[test]
     fn generate_client() {
-        let out = super::generate_client(
-            r##"datasource pg {
+        let out = super::generate(
+			r##"
+datasource pg {
 	provider = "mysql"
 	url = "mysql://root:prisma@localhost:3306/default@default"
 }
 
 model User {
     id String @id @default(cuid())
-}"##,
+}
+"##,
         );
         println!("{}", out);
     }

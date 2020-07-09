@@ -33,11 +33,6 @@ pub enum {enum.name} \{
 	{variant.render},
 	{{- endfor}}
 }
-impl Default for {enum.name} \{
-    fn default() -> Self \{
-        {enum.name}::{enum.default}
-    }
-}
 {{- endfor }}
 
 // ======================================================================================
