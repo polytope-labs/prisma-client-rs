@@ -118,6 +118,8 @@ impl Prisma \{
 		Ok(Self \{ executor, query_schema })
 	}
 
+	// TODO: support transactions.
+
 	{{- for operation in operations }}
     {{- for method in operation.methods }}
     pub async fn {method.fn_name}{ method.generics | unescaped }(&self{method.arg | unescaped}) -> Result<{ method.return | unescaped}, Error>
@@ -173,10 +175,12 @@ impl Prisma \{
     	log::debug!("\n\{}", doc);
     	let operation = convert(doc)?;
     	let schema = self.query_schema.clone();
-    	let response = self.executor.execute(operation, schema).await?;
+    	let response = self.executor.execute(operation, schema).await?.data;
 
-    	// serialize from map to Queryable.
-    	let value = serde_json::to_value(&response.data)
+    	// TODO: implement Deserializer for `Item`
+    	// let data = T::deserialize(response)
+    	//     .expect("Validation is done by prisma_derive::Queryable, this is infallible"));
+    	let value = serde_json::to_value(&response)
     		.expect("Deserializing to serde_json::Value should be infallible");
     	let data = serde_json::from_value(value)
     		.expect("Validation is done by prisma_client_derive::Queryable, this is infallible");
