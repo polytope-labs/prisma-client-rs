@@ -315,7 +315,7 @@ fn build_operation(out: &DMMFOutputType) -> Option<Value> {
             let return_ty = if use_batch {
                 "BatchPayload"
             } else if field.name.contains("findOne") {
-                "Option<T>"
+                "T"
             } else if field.name.contains("findMany") {
                 "Vec<T>"
             } else {
