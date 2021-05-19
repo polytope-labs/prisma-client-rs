@@ -1,27 +1,9 @@
 ///
 use chrono::{DateTime, Utc};
 
-/// Graphql inline-argument serialization.
-///
-/// this is entirely for serializing Structs to strings that can be inserted into a graphql query.
-///
-/// imagine
-///
-/// ```rust
-/// use prisma::to_query_args;
-/// #[derive(Serialize)]
-/// struct User {
-///     id: String,
-///     name: String
-/// }
-///
-/// to_query_args(&User { id: "28375fb6gsd".into(), name: "Seun Lanlege".into() });
-/// ```
-/// This produces `{ id: "28375fb6gsd", name: "Seun Lanlege" }`
-///
-/// notice the lack of surrounding quotes of Object keys.
 mod serialization;
 mod prisma;
+
 pub use prisma::*;
 pub use prisma_derive::Query;
 
@@ -44,6 +26,7 @@ pub trait Queryable {
 	fn query() -> String;
 }
 
+// TODO: use macro
 impl Queryable for DateTime<Utc> {
 	fn query() -> String {
 		String::new()

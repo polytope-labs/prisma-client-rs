@@ -5,12 +5,17 @@ authors = ["Seun <seunlanlege@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-feature-flags = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
-query-core = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
-query-engine = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
-prisma-models = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
-datamodel = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
-Inflector = "0.11.4"
-tinytemplate = "1.0.3"
-serde_json = "1.0.51"
+query-core = { git = "https://github.com/prisma/prisma-engines", branch = "master" }
+request-handlers = { git = "https://github.com/prisma/prisma-engines", branch = "master" }
+datamodel-connector = { git = "https://github.com/prisma/prisma-engines", branch = "master" }
+prisma-models = { git = "https://github.com/prisma/prisma-engines", branch = "master" }
+datamodel = { git = "https://github.com/prisma/prisma-engines", branch = "master" }
+
+Inflector = "0.11"
+tinytemplate = "1.0"
+serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
+tokio = { version = "1", features = ["full"] }

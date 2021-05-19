@@ -1,0 +1,2302 @@
+
+[
+    Type {
+        name: "UserWhereInput",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<UserWhereInputAnd>",
+                name: TypeName {
+                    render: "and",
+                    actual: "AND",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<UserWhereInput>>",
+                name: TypeName {
+                    render: "or",
+                    actual: "OR",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<UserWhereInputNot>",
+                name: TypeName {
+                    render: "not",
+                    actual: "NOT",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<UserWhereInputId>",
+                name: TypeName {
+                    render: "id",
+                    actual: "id",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<UserWhereInputRole>",
+                name: TypeName {
+                    render: "role",
+                    actual: "role",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "UserOrderByInput",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<SortOrder>",
+                name: TypeName {
+                    render: "id",
+                    actual: "id",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<SortOrder>",
+                name: TypeName {
+                    render: "role",
+                    actual: "role",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "UserWhereUniqueInput",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "id",
+                    actual: "id",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "UserScalarWhereWithAggregatesInput",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<UserScalarWhereWithAggregatesInputAnd>",
+                name: TypeName {
+                    render: "and",
+                    actual: "AND",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<UserScalarWhereWithAggregatesInput>>",
+                name: TypeName {
+                    render: "or",
+                    actual: "OR",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<UserScalarWhereWithAggregatesInputNot>",
+                name: TypeName {
+                    render: "not",
+                    actual: "NOT",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<UserScalarWhereWithAggregatesInputId>",
+                name: TypeName {
+                    render: "id",
+                    actual: "id",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<UserScalarWhereWithAggregatesInputRole>",
+                name: TypeName {
+                    render: "role",
+                    actual: "role",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "UserCreateInput",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "id",
+                    actual: "id",
+                },
+            },
+            TypeField {
+                is_required: true,
+                type: "UserType",
+                name: TypeName {
+                    render: "role",
+                    actual: "role",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "UserUncheckedCreateInput",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "id",
+                    actual: "id",
+                },
+            },
+            TypeField {
+                is_required: true,
+                type: "UserType",
+                name: TypeName {
+                    render: "role",
+                    actual: "role",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "UserUpdateInput",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<UserUpdateInputRole>",
+                name: TypeName {
+                    render: "role",
+                    actual: "role",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "UserUncheckedUpdateInput",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<UserUncheckedUpdateInputId>",
+                name: TypeName {
+                    render: "id",
+                    actual: "id",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<UserUncheckedUpdateInputRole>",
+                name: TypeName {
+                    render: "role",
+                    actual: "role",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "UserUpdateManyMutationInput",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<UserUpdateManyMutationInputRole>",
+                name: TypeName {
+                    render: "role",
+                    actual: "role",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "UserUncheckedUpdateManyInput",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<UserUncheckedUpdateManyInputId>",
+                name: TypeName {
+                    render: "id",
+                    actual: "id",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<UserUncheckedUpdateManyInputRole>",
+                name: TypeName {
+                    render: "role",
+                    actual: "role",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "StringFilter",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "equals",
+                    actual: "equals",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<String>>",
+                name: TypeName {
+                    render: "in",
+                    actual: "in",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<String>>",
+                name: TypeName {
+                    render: "not_in",
+                    actual: "notIn",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "lt",
+                    actual: "lt",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "lte",
+                    actual: "lte",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "gt",
+                    actual: "gt",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "gte",
+                    actual: "gte",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "contains",
+                    actual: "contains",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "starts_with",
+                    actual: "startsWith",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "ends_with",
+                    actual: "endsWith",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<StringFilterNot>",
+                name: TypeName {
+                    render: "not",
+                    actual: "not",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "EnumUserTypeFilter",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<UserType>",
+                name: TypeName {
+                    render: "equals",
+                    actual: "equals",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<UserType>>",
+                name: TypeName {
+                    render: "in",
+                    actual: "in",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<UserType>>",
+                name: TypeName {
+                    render: "not_in",
+                    actual: "notIn",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<EnumUserTypeFilterNot>",
+                name: TypeName {
+                    render: "not",
+                    actual: "not",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "StringWithAggregatesFilter",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "equals",
+                    actual: "equals",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<String>>",
+                name: TypeName {
+                    render: "in",
+                    actual: "in",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<String>>",
+                name: TypeName {
+                    render: "not_in",
+                    actual: "notIn",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "lt",
+                    actual: "lt",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "lte",
+                    actual: "lte",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "gt",
+                    actual: "gt",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "gte",
+                    actual: "gte",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "contains",
+                    actual: "contains",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "starts_with",
+                    actual: "startsWith",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "ends_with",
+                    actual: "endsWith",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<StringWithAggregatesFilterNot>",
+                name: TypeName {
+                    render: "not",
+                    actual: "not",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedIntFilter>",
+                name: TypeName {
+                    render: "count",
+                    actual: "count",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedStringFilter>",
+                name: TypeName {
+                    render: "min",
+                    actual: "min",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedStringFilter>",
+                name: TypeName {
+                    render: "max",
+                    actual: "max",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "EnumUserTypeWithAggregatesFilter",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<UserType>",
+                name: TypeName {
+                    render: "equals",
+                    actual: "equals",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<UserType>>",
+                name: TypeName {
+                    render: "in",
+                    actual: "in",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<UserType>>",
+                name: TypeName {
+                    render: "not_in",
+                    actual: "notIn",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<EnumUserTypeWithAggregatesFilterNot>",
+                name: TypeName {
+                    render: "not",
+                    actual: "not",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedIntFilter>",
+                name: TypeName {
+                    render: "count",
+                    actual: "count",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedEnumUserTypeFilter>",
+                name: TypeName {
+                    render: "min",
+                    actual: "min",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedEnumUserTypeFilter>",
+                name: TypeName {
+                    render: "max",
+                    actual: "max",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "EnumUserTypeFieldUpdateOperationsInput",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<UserType>",
+                name: TypeName {
+                    render: "set",
+                    actual: "set",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "StringFieldUpdateOperationsInput",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "set",
+                    actual: "set",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "NestedStringFilter",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "equals",
+                    actual: "equals",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<String>>",
+                name: TypeName {
+                    render: "in",
+                    actual: "in",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<String>>",
+                name: TypeName {
+                    render: "not_in",
+                    actual: "notIn",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "lt",
+                    actual: "lt",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "lte",
+                    actual: "lte",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "gt",
+                    actual: "gt",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "gte",
+                    actual: "gte",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "contains",
+                    actual: "contains",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "starts_with",
+                    actual: "startsWith",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "ends_with",
+                    actual: "endsWith",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedStringFilterNot>",
+                name: TypeName {
+                    render: "not",
+                    actual: "not",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "NestedEnumUserTypeFilter",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<UserType>",
+                name: TypeName {
+                    render: "equals",
+                    actual: "equals",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<UserType>>",
+                name: TypeName {
+                    render: "in",
+                    actual: "in",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<UserType>>",
+                name: TypeName {
+                    render: "not_in",
+                    actual: "notIn",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedEnumUserTypeFilterNot>",
+                name: TypeName {
+                    render: "not",
+                    actual: "not",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "NestedStringWithAggregatesFilter",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "equals",
+                    actual: "equals",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<String>>",
+                name: TypeName {
+                    render: "in",
+                    actual: "in",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<String>>",
+                name: TypeName {
+                    render: "not_in",
+                    actual: "notIn",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "lt",
+                    actual: "lt",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "lte",
+                    actual: "lte",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "gt",
+                    actual: "gt",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "gte",
+                    actual: "gte",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "contains",
+                    actual: "contains",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "starts_with",
+                    actual: "startsWith",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "ends_with",
+                    actual: "endsWith",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedStringWithAggregatesFilterNot>",
+                name: TypeName {
+                    render: "not",
+                    actual: "not",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedIntFilter>",
+                name: TypeName {
+                    render: "count",
+                    actual: "count",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedStringFilter>",
+                name: TypeName {
+                    render: "min",
+                    actual: "min",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedStringFilter>",
+                name: TypeName {
+                    render: "max",
+                    actual: "max",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "NestedIntFilter",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<i32>",
+                name: TypeName {
+                    render: "equals",
+                    actual: "equals",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<i32>>",
+                name: TypeName {
+                    render: "in",
+                    actual: "in",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<i32>>",
+                name: TypeName {
+                    render: "not_in",
+                    actual: "notIn",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<i32>",
+                name: TypeName {
+                    render: "lt",
+                    actual: "lt",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<i32>",
+                name: TypeName {
+                    render: "lte",
+                    actual: "lte",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<i32>",
+                name: TypeName {
+                    render: "gt",
+                    actual: "gt",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<i32>",
+                name: TypeName {
+                    render: "gte",
+                    actual: "gte",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedIntFilterNot>",
+                name: TypeName {
+                    render: "not",
+                    actual: "not",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "NestedEnumUserTypeWithAggregatesFilter",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "Option<UserType>",
+                name: TypeName {
+                    render: "equals",
+                    actual: "equals",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<UserType>>",
+                name: TypeName {
+                    render: "in",
+                    actual: "in",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<Vec<UserType>>",
+                name: TypeName {
+                    render: "not_in",
+                    actual: "notIn",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedEnumUserTypeWithAggregatesFilterNot>",
+                name: TypeName {
+                    render: "not",
+                    actual: "not",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedIntFilter>",
+                name: TypeName {
+                    render: "count",
+                    actual: "count",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedEnumUserTypeFilter>",
+                name: TypeName {
+                    render: "min",
+                    actual: "min",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "Option<NestedEnumUserTypeFilter>",
+                name: TypeName {
+                    render: "max",
+                    actual: "max",
+                },
+            },
+        ],
+    },
+]
+
+
+
+
+
+[
+    Enum {
+        name: "UserWhereInputAnd",
+        variants: [
+            TypeName {
+                render: "UserWhereInput(UserWhereInput)",
+                actual: "",
+            },
+            TypeName {
+                render: "UserWhereInputList(Vec<UserWhereInput>)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "UserWhereInputNot",
+        variants: [
+            TypeName {
+                render: "UserWhereInput(UserWhereInput)",
+                actual: "",
+            },
+            TypeName {
+                render: "UserWhereInputList(Vec<UserWhereInput>)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "UserWhereInputId",
+        variants: [
+            TypeName {
+                render: "StringFilter(StringFilter)",
+                actual: "",
+            },
+            TypeName {
+                render: "String(String)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "UserWhereInputRole",
+        variants: [
+            TypeName {
+                render: "EnumUserTypeFilter(EnumUserTypeFilter)",
+                actual: "",
+            },
+            TypeName {
+                render: "UserType(UserType)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "UserScalarWhereWithAggregatesInputAnd",
+        variants: [
+            TypeName {
+                render: "UserScalarWhereWithAggregatesInput(UserScalarWhereWithAggregatesInput)",
+                actual: "",
+            },
+            TypeName {
+                render: "UserScalarWhereWithAggregatesInputList(Vec<UserScalarWhereWithAggregatesInput>)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "UserScalarWhereWithAggregatesInputNot",
+        variants: [
+            TypeName {
+                render: "UserScalarWhereWithAggregatesInput(UserScalarWhereWithAggregatesInput)",
+                actual: "",
+            },
+            TypeName {
+                render: "UserScalarWhereWithAggregatesInputList(Vec<UserScalarWhereWithAggregatesInput>)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "UserScalarWhereWithAggregatesInputId",
+        variants: [
+            TypeName {
+                render: "StringWithAggregatesFilter(StringWithAggregatesFilter)",
+                actual: "",
+            },
+            TypeName {
+                render: "String(String)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "UserScalarWhereWithAggregatesInputRole",
+        variants: [
+            TypeName {
+                render: "EnumUserTypeWithAggregatesFilter(EnumUserTypeWithAggregatesFilter)",
+                actual: "",
+            },
+            TypeName {
+                render: "UserType(UserType)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "UserUpdateInputRole",
+        variants: [
+            TypeName {
+                render: "UserType(UserType)",
+                actual: "",
+            },
+            TypeName {
+                render: "EnumUserTypeFieldUpdateOperationsInput(EnumUserTypeFieldUpdateOperationsInput)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "UserUncheckedUpdateInputId",
+        variants: [
+            TypeName {
+                render: "String(String)",
+                actual: "",
+            },
+            TypeName {
+                render: "StringFieldUpdateOperationsInput(StringFieldUpdateOperationsInput)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "UserUncheckedUpdateInputRole",
+        variants: [
+            TypeName {
+                render: "UserType(UserType)",
+                actual: "",
+            },
+            TypeName {
+                render: "EnumUserTypeFieldUpdateOperationsInput(EnumUserTypeFieldUpdateOperationsInput)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "UserUpdateManyMutationInputRole",
+        variants: [
+            TypeName {
+                render: "UserType(UserType)",
+                actual: "",
+            },
+            TypeName {
+                render: "EnumUserTypeFieldUpdateOperationsInput(EnumUserTypeFieldUpdateOperationsInput)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "UserUncheckedUpdateManyInputId",
+        variants: [
+            TypeName {
+                render: "String(String)",
+                actual: "",
+            },
+            TypeName {
+                render: "StringFieldUpdateOperationsInput(StringFieldUpdateOperationsInput)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "UserUncheckedUpdateManyInputRole",
+        variants: [
+            TypeName {
+                render: "UserType(UserType)",
+                actual: "",
+            },
+            TypeName {
+                render: "EnumUserTypeFieldUpdateOperationsInput(EnumUserTypeFieldUpdateOperationsInput)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "StringFilterNot",
+        variants: [
+            TypeName {
+                render: "String(String)",
+                actual: "",
+            },
+            TypeName {
+                render: "NestedStringFilter(NestedStringFilter)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "EnumUserTypeFilterNot",
+        variants: [
+            TypeName {
+                render: "UserType(UserType)",
+                actual: "",
+            },
+            TypeName {
+                render: "NestedEnumUserTypeFilter(NestedEnumUserTypeFilter)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "StringWithAggregatesFilterNot",
+        variants: [
+            TypeName {
+                render: "String(String)",
+                actual: "",
+            },
+            TypeName {
+                render: "NestedStringWithAggregatesFilter(NestedStringWithAggregatesFilter)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "EnumUserTypeWithAggregatesFilterNot",
+        variants: [
+            TypeName {
+                render: "UserType(UserType)",
+                actual: "",
+            },
+            TypeName {
+                render: "NestedEnumUserTypeWithAggregatesFilter(NestedEnumUserTypeWithAggregatesFilter)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "NestedStringFilterNot",
+        variants: [
+            TypeName {
+                render: "String(String)",
+                actual: "",
+            },
+            TypeName {
+                render: "NestedStringFilter(NestedStringFilter)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "NestedEnumUserTypeFilterNot",
+        variants: [
+            TypeName {
+                render: "UserType(UserType)",
+                actual: "",
+            },
+            TypeName {
+                render: "NestedEnumUserTypeFilter(NestedEnumUserTypeFilter)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "NestedStringWithAggregatesFilterNot",
+        variants: [
+            TypeName {
+                render: "String(String)",
+                actual: "",
+            },
+            TypeName {
+                render: "NestedStringWithAggregatesFilter(NestedStringWithAggregatesFilter)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "NestedIntFilterNot",
+        variants: [
+            TypeName {
+                render: "Int(Int)",
+                actual: "",
+            },
+            TypeName {
+                render: "NestedIntFilter(NestedIntFilter)",
+                actual: "",
+            },
+        ],
+    },
+    Enum {
+        name: "NestedEnumUserTypeWithAggregatesFilterNot",
+        variants: [
+            TypeName {
+                render: "UserType(UserType)",
+                actual: "",
+            },
+            TypeName {
+                render: "NestedEnumUserTypeWithAggregatesFilter(NestedEnumUserTypeWithAggregatesFilter)",
+                actual: "",
+            },
+        ],
+    },
+]
+
+
+
+
+
+
+
+[
+    Type {
+        name: "AggregateUser",
+        fields: [
+            TypeField {
+                is_required: true,
+                type: "Option<UserCountAggregateOutputType>",
+                name: TypeName {
+                    render: "count",
+                    actual: "count",
+                },
+            },
+            TypeField {
+                is_required: true,
+                type: "Option<UserMinAggregateOutputType>",
+                name: TypeName {
+                    render: "min",
+                    actual: "min",
+                },
+            },
+            TypeField {
+                is_required: true,
+                type: "Option<UserMaxAggregateOutputType>",
+                name: TypeName {
+                    render: "max",
+                    actual: "max",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "UserGroupByOutputType",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "String",
+                name: TypeName {
+                    render: "id",
+                    actual: "id",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "UserType",
+                name: TypeName {
+                    render: "role",
+                    actual: "role",
+                },
+            },
+            TypeField {
+                is_required: true,
+                type: "Option<UserCountAggregateOutputType>",
+                name: TypeName {
+                    render: "count",
+                    actual: "count",
+                },
+            },
+            TypeField {
+                is_required: true,
+                type: "Option<UserMinAggregateOutputType>",
+                name: TypeName {
+                    render: "min",
+                    actual: "min",
+                },
+            },
+            TypeField {
+                is_required: true,
+                type: "Option<UserMaxAggregateOutputType>",
+                name: TypeName {
+                    render: "max",
+                    actual: "max",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "AffectedRowsOutput",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "i32",
+                name: TypeName {
+                    render: "count",
+                    actual: "count",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "UserCountAggregateOutputType",
+        fields: [
+            TypeField {
+                is_required: false,
+                type: "i32",
+                name: TypeName {
+                    render: "id",
+                    actual: "id",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "i32",
+                name: TypeName {
+                    render: "role",
+                    actual: "role",
+                },
+            },
+            TypeField {
+                is_required: false,
+                type: "i32",
+                name: TypeName {
+                    render: "all",
+                    actual: "_all",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "UserMinAggregateOutputType",
+        fields: [
+            TypeField {
+                is_required: true,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "id",
+                    actual: "id",
+                },
+            },
+            TypeField {
+                is_required: true,
+                type: "Option<UserType>",
+                name: TypeName {
+                    render: "role",
+                    actual: "role",
+                },
+            },
+        ],
+    },
+    Type {
+        name: "UserMaxAggregateOutputType",
+        fields: [
+            TypeField {
+                is_required: true,
+                type: "Option<String>",
+                name: TypeName {
+                    render: "id",
+                    actual: "id",
+                },
+            },
+            TypeField {
+                is_required: true,
+                type: "Option<UserType>",
+                name: TypeName {
+                    render: "role",
+                    actual: "role",
+                },
+            },
+        ],
+    },
+]
+
+
+
+
+
+
+
+[
+    DmmfOutputType {
+        name: "Query",
+        fields: [
+            DmmfOutputField {
+                name: "findFirstUser",
+                args: [
+                    DmmfInputField {
+                        name: "where",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserWhereInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "orderBy",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserOrderByInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: true,
+                            },
+                            DmmfTypeReference {
+                                typ: "UserOrderByInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "cursor",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserWhereUniqueInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "take",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "Int",
+                                namespace: None,
+                                location: Scalar,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "skip",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "Int",
+                                namespace: None,
+                                location: Scalar,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "distinct",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserScalarFieldEnum",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: EnumTypes,
+                                is_list: true,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                ],
+                is_nullable: true,
+                output_type: DmmfTypeReference {
+                    typ: "User",
+                    namespace: Some(
+                        "model",
+                    ),
+                    location: OutputObjectTypes,
+                    is_list: false,
+                },
+                deprecation: None,
+            },
+            DmmfOutputField {
+                name: "findManyUser",
+                args: [
+                    DmmfInputField {
+                        name: "where",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserWhereInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "orderBy",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserOrderByInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: true,
+                            },
+                            DmmfTypeReference {
+                                typ: "UserOrderByInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "cursor",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserWhereUniqueInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "take",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "Int",
+                                namespace: None,
+                                location: Scalar,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "skip",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "Int",
+                                namespace: None,
+                                location: Scalar,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "distinct",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserScalarFieldEnum",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: EnumTypes,
+                                is_list: true,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                ],
+                is_nullable: false,
+                output_type: DmmfTypeReference {
+                    typ: "User",
+                    namespace: Some(
+                        "model",
+                    ),
+                    location: OutputObjectTypes,
+                    is_list: true,
+                },
+                deprecation: None,
+            },
+            DmmfOutputField {
+                name: "aggregateUser",
+                args: [
+                    DmmfInputField {
+                        name: "where",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserWhereInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "orderBy",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserOrderByInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: true,
+                            },
+                            DmmfTypeReference {
+                                typ: "UserOrderByInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "cursor",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserWhereUniqueInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "take",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "Int",
+                                namespace: None,
+                                location: Scalar,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "skip",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "Int",
+                                namespace: None,
+                                location: Scalar,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                ],
+                is_nullable: false,
+                output_type: DmmfTypeReference {
+                    typ: "AggregateUser",
+                    namespace: Some(
+                        "prisma",
+                    ),
+                    location: OutputObjectTypes,
+                    is_list: false,
+                },
+                deprecation: None,
+            },
+            DmmfOutputField {
+                name: "groupByUser",
+                args: [
+                    DmmfInputField {
+                        name: "where",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserWhereInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "orderBy",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserOrderByInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: true,
+                            },
+                            DmmfTypeReference {
+                                typ: "UserOrderByInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "by",
+                        is_required: true,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserScalarFieldEnum",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: EnumTypes,
+                                is_list: true,
+                            },
+                            DmmfTypeReference {
+                                typ: "UserScalarFieldEnum",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: EnumTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "having",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserScalarWhereWithAggregatesInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "take",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "Int",
+                                namespace: None,
+                                location: Scalar,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "skip",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "Int",
+                                namespace: None,
+                                location: Scalar,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                ],
+                is_nullable: false,
+                output_type: DmmfTypeReference {
+                    typ: "UserGroupByOutputType",
+                    namespace: Some(
+                        "prisma",
+                    ),
+                    location: OutputObjectTypes,
+                    is_list: true,
+                },
+                deprecation: None,
+            },
+            DmmfOutputField {
+                name: "findUniqueUser",
+                args: [
+                    DmmfInputField {
+                        name: "where",
+                        is_required: true,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserWhereUniqueInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                ],
+                is_nullable: true,
+                output_type: DmmfTypeReference {
+                    typ: "User",
+                    namespace: Some(
+                        "model",
+                    ),
+                    location: OutputObjectTypes,
+                    is_list: false,
+                },
+                deprecation: None,
+            },
+        ],
+    },
+    DmmfOutputType {
+        name: "Mutation",
+        fields: [
+            DmmfOutputField {
+                name: "createOneUser",
+                args: [
+                    DmmfInputField {
+                        name: "data",
+                        is_required: true,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserCreateInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                            DmmfTypeReference {
+                                typ: "UserUncheckedCreateInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                ],
+                is_nullable: false,
+                output_type: DmmfTypeReference {
+                    typ: "User",
+                    namespace: Some(
+                        "model",
+                    ),
+                    location: OutputObjectTypes,
+                    is_list: false,
+                },
+                deprecation: None,
+            },
+            DmmfOutputField {
+                name: "upsertOneUser",
+                args: [
+                    DmmfInputField {
+                        name: "where",
+                        is_required: true,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserWhereUniqueInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "create",
+                        is_required: true,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserCreateInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                            DmmfTypeReference {
+                                typ: "UserUncheckedCreateInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "update",
+                        is_required: true,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserUpdateInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                            DmmfTypeReference {
+                                typ: "UserUncheckedUpdateInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                ],
+                is_nullable: false,
+                output_type: DmmfTypeReference {
+                    typ: "User",
+                    namespace: Some(
+                        "model",
+                    ),
+                    location: OutputObjectTypes,
+                    is_list: false,
+                },
+                deprecation: None,
+            },
+            DmmfOutputField {
+                name: "deleteOneUser",
+                args: [
+                    DmmfInputField {
+                        name: "where",
+                        is_required: true,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserWhereUniqueInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                ],
+                is_nullable: true,
+                output_type: DmmfTypeReference {
+                    typ: "User",
+                    namespace: Some(
+                        "model",
+                    ),
+                    location: OutputObjectTypes,
+                    is_list: false,
+                },
+                deprecation: None,
+            },
+            DmmfOutputField {
+                name: "updateOneUser",
+                args: [
+                    DmmfInputField {
+                        name: "data",
+                        is_required: true,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserUpdateInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                            DmmfTypeReference {
+                                typ: "UserUncheckedUpdateInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "where",
+                        is_required: true,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserWhereUniqueInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                ],
+                is_nullable: true,
+                output_type: DmmfTypeReference {
+                    typ: "User",
+                    namespace: Some(
+                        "model",
+                    ),
+                    location: OutputObjectTypes,
+                    is_list: false,
+                },
+                deprecation: None,
+            },
+            DmmfOutputField {
+                name: "updateManyUser",
+                args: [
+                    DmmfInputField {
+                        name: "data",
+                        is_required: true,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserUpdateManyMutationInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                            DmmfTypeReference {
+                                typ: "UserUncheckedUpdateManyInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "where",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserWhereInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                ],
+                is_nullable: false,
+                output_type: DmmfTypeReference {
+                    typ: "AffectedRowsOutput",
+                    namespace: Some(
+                        "prisma",
+                    ),
+                    location: OutputObjectTypes,
+                    is_list: false,
+                },
+                deprecation: None,
+            },
+            DmmfOutputField {
+                name: "deleteManyUser",
+                args: [
+                    DmmfInputField {
+                        name: "where",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "UserWhereInput",
+                                namespace: Some(
+                                    "prisma",
+                                ),
+                                location: InputObjectTypes,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                ],
+                is_nullable: false,
+                output_type: DmmfTypeReference {
+                    typ: "AffectedRowsOutput",
+                    namespace: Some(
+                        "prisma",
+                    ),
+                    location: OutputObjectTypes,
+                    is_list: false,
+                },
+                deprecation: None,
+            },
+            DmmfOutputField {
+                name: "executeRaw",
+                args: [
+                    DmmfInputField {
+                        name: "query",
+                        is_required: true,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "String",
+                                namespace: None,
+                                location: Scalar,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "parameters",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "Json",
+                                namespace: None,
+                                location: Scalar,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                ],
+                is_nullable: false,
+                output_type: DmmfTypeReference {
+                    typ: "Json",
+                    namespace: None,
+                    location: Scalar,
+                    is_list: false,
+                },
+                deprecation: None,
+            },
+            DmmfOutputField {
+                name: "queryRaw",
+                args: [
+                    DmmfInputField {
+                        name: "query",
+                        is_required: true,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "String",
+                                namespace: None,
+                                location: Scalar,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                    DmmfInputField {
+                        name: "parameters",
+                        is_required: false,
+                        is_nullable: false,
+                        input_types: [
+                            DmmfTypeReference {
+                                typ: "Json",
+                                namespace: None,
+                                location: Scalar,
+                                is_list: false,
+                            },
+                        ],
+                        deprecation: None,
+                    },
+                ],
+                is_nullable: false,
+                output_type: DmmfTypeReference {
+                    typ: "Json",
+                    namespace: None,
+                    location: Scalar,
+                    is_list: false,
+                },
+                deprecation: None,
+            },
+        ],
+    },
+]
+test test::generate_client ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+2021-05-13 07:25:49,322 INFO  [cargo_remote] Transferring Cargo.lock file back to client.
+
+              0   0%    0.00kB/s    0:00:00 (xfr#0, to-chk=0/1)

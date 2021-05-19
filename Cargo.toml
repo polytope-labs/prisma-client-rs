@@ -5,10 +5,7 @@ authors = ["Seun Lanlege <seunlanlege@gmail.com>"]
 edition = "2018"
 
 [workspace]
-members = [
-	"codegen",
-	"derive"
-]
+members = ["codegen", "derive"]
 
 [lib]
 path = "lib.rs"
@@ -17,24 +14,25 @@ path = "lib.rs"
 prisma-codegen = { path = "./codegen" }
 
 [dependencies]
-serde_json = "1.0.50"
-serde = { version = "1.0.106", features = ["serde_derive"] }
-derive_more = "0.99.5"
+# serialization
 itoa = "0.4.5"
-chrono = "0.4"
 ryu = "1.0.3"
-prisma-derive = { path = "./derive" }
-rust_decimal = "1.6"
-log = "0.4.8"
-url = "2.1.1"
-graphql-parser = "0.3.0"
-Inflector = "0.11"
+serde_json = "1.0"
+serde = { version = "1.0", features = ["serde_derive"] }
+
 # prisma dependecies
-sql-query-connector = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
-query-connector = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
-feature-flags = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
-query-core = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
-prisma-models = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
-datamodel = { git = "https://github.com/seunlanlege/prisma-engines", branch = "master" }
-juniper = { git = "https://github.com/graphql-rust/juniper.git", rev = "c761d91" }
+graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
+request-handlers = { git = "https://github.com/prisma/prisma-engines", branch = "master" }
+query-connector = { git = "https://github.com/prisma/prisma-engines", branch = "master" }
+query-core = { git = "https://github.com/prisma/prisma-engines", branch = "master" }
+prisma-models = { git = "https://github.com/prisma/prisma-engines", branch = "master" }
+datamodel = { git = "https://github.com/prisma/prisma-engines", branch = "master" }
+
+# others
+prisma-derive = { path = "./derive" }
+derive_more = "0.99"
+chrono = "0.4"
+log = "0.4"
+Inflector = "0.11"
 futures = "0.3"
+juniper = { git = "https://github.com/graphql-rust/juniper.git", rev = "c761d91" }
