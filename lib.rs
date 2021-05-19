@@ -4,6 +4,8 @@ use chrono::{DateTime, Utc};
 mod serialization;
 mod prisma;
 
+pub use datamodel::common::preview_features::PreviewFeature;
+
 pub use prisma::*;
 pub use prisma_derive::Query;
 
@@ -51,48 +53,6 @@ impl<T: Queryable> Queryable for Box<T> {
 	}
 }
 
-impl Queryable for u128 {
-	fn query() -> String {
-		String::new()
-	}
-}
-
-impl Queryable for u64 {
-	fn query() -> String {
-		String::new()
-	}
-}
-
-impl Queryable for u32 {
-	fn query() -> String {
-		String::new()
-	}
-}
-
-impl Queryable for u16 {
-	fn query() -> String {
-		String::new()
-	}
-}
-
-impl Queryable for u8 {
-	fn query() -> String {
-		String::new()
-	}
-}
-
-impl Queryable for i128 {
-	fn query() -> String {
-		String::new()
-	}
-}
-
-impl Queryable for i64 {
-	fn query() -> String {
-		String::new()
-	}
-}
-
 impl Queryable for i32 {
 	fn query() -> String {
 		String::new()
@@ -106,6 +66,12 @@ impl Queryable for i16 {
 }
 
 impl Queryable for i8 {
+	fn query() -> String {
+		String::new()
+	}
+}
+
+impl Queryable for f32 {
 	fn query() -> String {
 		String::new()
 	}

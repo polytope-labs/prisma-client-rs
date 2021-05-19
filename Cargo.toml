@@ -1,11 +1,11 @@
 [package]
-name = "prisma"
+name = "prisma-client"
 version = "0.1.0"
 authors = ["Seun Lanlege <seunlanlege@gmail.com>"]
 edition = "2018"
 
 [workspace]
-members = ["codegen", "derive"]
+members = ["codegen", "derive", "example/sqlite"]
 
 [lib]
 path = "lib.rs"

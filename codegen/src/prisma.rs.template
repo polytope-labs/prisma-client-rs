@@ -42,8 +42,7 @@ pub enum {enum.name} \{
 #[derive(Clone, Default, Serialize, Debug)]
 pub struct {struct.name} \{
     {{- for field in struct.fields}}
-    {{- if field.is_required }}
-    {{- else }}
+    {{- if not field.is_required }}
     #[serde(skip_serializing_if = "Option::is_none")]
     {{- endif }}
     #[serde(rename = "{field.name.actual}")]
@@ -58,8 +57,7 @@ pub struct {struct.name} \{
 #[derive(Clone, Serialize, Deserialize, Debug, QueryInternal)]
 pub struct {struct.name} \{
     {{- for field in struct.fields}}
-    {{- if field.is_required }}
-    {{- else }}
+    {{- if not field.is_required }}
     #[serde(skip_serializing_if = "Option::is_none")]
     {{- endif }}
     #[serde(rename = "{field.name.actual}")]
@@ -76,8 +74,7 @@ pub struct {struct.name} \{
 #[derive(Clone, Default, Serialize, Debug)]
 pub struct {struct.name} \{
     {{-for field in struct.fields}}
-    {{-if field.is_required }}
-    {{- else }}
+    {{-if not field.is_required }}
     #[serde(skip_serializing_if = "Option::is_none")]
     {{- endif }}
     pub {field.name.render}: {field.type | unescaped},

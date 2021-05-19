@@ -157,9 +157,12 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
                     };
 
                     let is_relation = is_relation(models, &field.name);
-                    let list = field.input_types.iter().find(|typ_ref| typ_ref.is_list);
+                    let list_or_unchecked_input = field.input_types.iter()
+                        .find(|typ_ref| {
+                            typ_ref.is_list || typ_ref.typ.to_lowercase().contains("checked")
+                        });
 
-                    if field.input_types.len() > 1 && list.is_none() {
+                    if field.input_types.len() > 1 && list_or_unchecked_input.is_none() {
                         inputs_enums.push(Enum {
                             name: format!("{}{}", &input_name.to_pascal_case(), field.name.to_pascal_case()),
                             variants: field.input_types.iter()
@@ -227,7 +230,7 @@ fn build_outupts(outputs: Vec<DmmfOutputType>, models: &Vec<Field>) -> Vec<Type>
                         formatted
                     };
                     TypeField {
-                        is_required: field.is_nullable,
+                        is_required: !field.is_nullable,
                         name: TypeName {
                             render: field.name.to_snake_case(),
                             rename: true,
@@ -263,19 +266,29 @@ fn is_relation(models: &Vec<Field>, name: &str) -> bool {
 
 fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
     let is_update = name.contains("UpdateInput");
+    let needs_box = needs_box || name.to_lowercase().contains("nested");
 
     let list = input.input_types.iter()
         .find(|typ_ref| typ_ref.is_list);
 
+    let checked_input = input.input_types.iter()
+        .find(|typ_ref| !typ_ref.typ.contains("Checked"));
+
     let formatted = if let Some(list) = list {
         dmmf_type_to_rust(list, needs_box)
+    } else if let Some(input) = checked_input {
+        dmmf_type_to_rust(input, needs_box)
     } else if input.input_types.len() > 1 {
-        format!("{}{}", name.to_pascal_case(), input.name.to_pascal_case())
+        let mut typ_name = format!("{}{}", name.to_pascal_case(), input.name.to_pascal_case());
+        if needs_box {
+            typ_name = format!("Box<{}>", typ_name);
+        }
+        typ_name
     } else {
         dmmf_type_to_rust(&input.input_types[0], needs_box)
     };
 
-    if !input.is_required && is_update && needs_box {
+    if !input.is_required && is_update {
         format!("Option<Option<{}>>", formatted)
     } else if !input.is_required {
         format!("Option<{}>", formatted)
@@ -289,7 +302,7 @@ fn dmmf_type_to_rust(type_ref: &DmmfTypeReference, needs_box: bool) -> String {
     let formatted = match type_ref.typ.as_str() {
         // graphql scalar types.
         "Int" => "i32",
-        "Float" => "f64",
+        "Float" => "f32",
         "Boolean" => "bool",
         "DateTime" => "chrono::DateTime<chrono::Utc>",
         "Json" => "serde_json::Value",
@@ -484,75 +497,5 @@ mod test {
         "##);
 
         println!("{}", out);
-    }
-
-
-    #[tokio::test]
-    async fn test_connection() {
-        let datamodel_str = r###"
-            generator client {
-              provider = "prisma-client-js"
-            }
-
-            datasource db {
-              provider = "sqlite"
-              url      = "file:./dev.db"
-            }
-
-            model User {
-              id    Int     @id @default(autoincrement())
-              email String  @unique
-              name  String?
-              posts Post[]
-            }
-
-            model Post {
-              id        Int      @id @default(autoincrement())
-              createdAt DateTime @default(now())
-              updatedAt DateTime @updatedAt
-              title     String
-              content   String?
-              published Boolean  @default(false)
-              viewCount Int      @default(0)
-              author    User?    @relation(fields: [authorId], references: [id])
-              authorId  Int?
-            }
-
-        "###;
-        let config = parse_configuration(datamodel_str).unwrap().subject;
-        let source = config.datasources.first()
-            .expect("Please supply a datasource in your datamodel.prisma file");
-
-        let model = parse_datamodel(datamodel_str).unwrap().subject;
-        let url = source.load_url().unwrap();
-        let (db_name, executor) = exec_loader::load(&source, &vec![], &url).await.unwrap();
-
-        let internal_model = DatamodelConverter::convert(&model).build(db_name);
-        let query_schema = Arc::new(schema_builder::build(
-            internal_model,
-            BuildMode::Modern,
-            true,
-            source.capabilities(),
-            vec![]
-        ));
-        // verify connection
-        executor.primary_connector().get_connection().await.unwrap();
-
-        // interpolate variables into query string
-        let query = r###"
-            query {
-                aggregateUser(where: { id: 2 }) {
-                    id
-                    name
-                    email
-                }
-            }
-        "###;
-        let gql_doc = graphql_parser::parse_query(query).unwrap();
-        let operation = GraphQLProtocolAdapter::convert(gql_doc, None).unwrap();
-
-        let data = executor.execute(operation, query_schema).await.unwrap();
-
-        println!("response: {:#?}", data);
     }
 }
