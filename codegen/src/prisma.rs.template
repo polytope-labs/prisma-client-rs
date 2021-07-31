@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::\{sync::Arc, env};
 
 use datamodel::\{parse_datamodel, parse_configuration, common::preview_features::PreviewFeature};
 use query_core::\{BuildMode, QuerySchema, executor::QueryExecutor, exec_loader, schema_builder};
@@ -110,7 +110,11 @@ impl Prisma \{
 			.expect("Please supply a datasource in your datamodel.prisma file");
 
 		let model = parse_datamodel(datamodel_str)?.subject;
-		let url = source.load_url()?;
+		let url = if let Some(url) = source.load_shadow_database_url()? \{
+			url
+		} else \{
+			source.load_url(|key| env::var(key).ok())?
+		};
 		let (db_name, executor) = exec_loader::load(&source, &preview_features, &url).await?;
 
 		let internal_model = DatamodelConverter::convert(&model).build(db_name);
@@ -128,6 +132,9 @@ impl Prisma \{
 	}
 
 	// TODO: support transactions.
+	// TODO: add docs to methods
+	// TODO: generate model types
+	// TODO: replace nullable types, with Option<Option<T>>
 
 	{{- for operation in operations }}
     {{- for method in operation.methods }}

@@ -17,7 +17,7 @@ mod tests {
         let user = client.create_user::<User>(
             UserCreateInput {
                 name: Some("Seun Lanlege".into()),
-                email: "seunlanlege@gmail.com".into(),
+                email: "seun@parity.io".into(),
                 ..Default::default()
             }
         ).await.unwrap();

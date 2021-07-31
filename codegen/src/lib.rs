@@ -104,7 +104,13 @@ fn generate(model_str: &str) -> String {
         .remove("prisma")
         .unwrap()
         .into_iter()
-        .map(|input_type| (input_type.name, input_type.fields))
+        .filter_map(|input_type| {
+            if !input_type.name.contains("Unchecked") {
+                Some((input_type.name, input_type.fields))
+            } else {
+                None
+            }
+        })
         .collect::<Vec<_>>();
     let (inputs, inputs_enums) = build_inputs(inputs, &models);
 
@@ -137,8 +143,8 @@ fn generate(model_str: &str) -> String {
 
     let mut tt = tinytemplate::TinyTemplate::new();
     tt.add_template("client", include_str!("./prisma.rs.template"))
-        .unwrap();
-    tt.render("client", &data).unwrap()
+        .expect("Couldn't add Template");
+    tt.render("client", &data).expect("Couldn't write to template")
 }
 
 /// Convert input objects to TypeField
@@ -149,32 +155,39 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
         .map(|(input_name, input_type)| {
             let fields = input_type
                 .iter()
-                .map(|field| {
+                .filter_map(|field| {
+                    if field.deprecation.is_some() || input_name.contains("Unchecked") {
+                        // no point generating unchecked input types
+                        return None
+                    }
                     let name = match &*field.name {
                         "where" => "filter".to_owned(),
                         "in" => "within".to_owned(),
                         _ => field.name.to_snake_case()
                     };
 
-                    let is_relation = is_relation(models, &field.name);
-                    let list_or_unchecked_input = field.input_types.iter()
-                        .find(|typ_ref| {
-                            typ_ref.is_list || typ_ref.typ.to_lowercase().contains("checked")
-                        });
+                    println!("\n\nfield: {}-{:#?}\n\n", input_name, field);
 
-                    if field.input_types.len() > 1 && list_or_unchecked_input.is_none() {
+                    let is_relation = is_relation(models, &field.name);
+                    let without_list_or_unchecked_input = field.input_types.iter()
+                        .filter_map(|typ_ref| {
+                            if typ_ref.is_list || typ_ref.typ.contains("Unchecked") {
+                                None
+                            } else {
+                                Some(typ_ref)
+                            }
+                        })
+                        .collect::<Vec<_>>();
+
+                    println!("{:#?}", without_list_or_unchecked_input);
+
+                    if without_list_or_unchecked_input.len() > 1 {
                         inputs_enums.push(Enum {
                             name: format!("{}{}", &input_name.to_pascal_case(), field.name.to_pascal_case()),
-                            variants: field.input_types.iter()
+                            variants: without_list_or_unchecked_input.iter()
                                 .map(|type_ref| {
                                     let typ = dmmf_type_to_rust(&type_ref, false);
-                                    if type_ref.is_list {
-                                        TypeName {
-                                            render: format!("{}List({})", type_ref.typ, typ),
-                                            rename: false,
-                                            actual: format!("")
-                                        }
-                                    } else if type_ref.typ == "Null" {
+                                    if type_ref.typ == "Null" {
                                         TypeName {
                                             render: "Null".into(),
                                             rename: true,
@@ -192,7 +205,7 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
                         });
                     }
 
-                    TypeField {
+                    let type_field = TypeField {
                         is_required: field.is_required,
                         name: TypeName {
                             render: name,
@@ -200,7 +213,9 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
                             actual: field.name.clone(),
                         },
                         r#type: format(&field, &input_name, is_relation)
-                    }
+                    };
+
+                    Some(type_field)
                 })
                 .collect::<Vec<_>>();
 
@@ -218,10 +233,13 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
 fn build_outupts(outputs: Vec<DmmfOutputType>, models: &Vec<Field>) -> Vec<Type> {
     outputs.iter()
         .map(|output_type| {
-            let fields = output_type
-                .fields
+            let fields = output_type.fields
                 .iter()
-                .map(|field| {
+                .filter_map(|field| {
+                    if field.deprecation.is_some() {
+                        // agregate fields must start with _
+                        return None
+                    }
                     let is_relation = is_relation(&models, &field.name);
                     let formatted = dmmf_type_to_rust(&field.output_type, is_relation);
                     let formatted = if field.is_nullable {
@@ -229,7 +247,7 @@ fn build_outupts(outputs: Vec<DmmfOutputType>, models: &Vec<Field>) -> Vec<Type>
                     } else {
                         formatted
                     };
-                    TypeField {
+                    Some(TypeField {
                         is_required: !field.is_nullable,
                         name: TypeName {
                             render: field.name.to_snake_case(),
@@ -237,7 +255,7 @@ fn build_outupts(outputs: Vec<DmmfOutputType>, models: &Vec<Field>) -> Vec<Type>
                             actual: field.name.clone(),
                         },
                         r#type: formatted,
-                    }
+                    })
                 })
                 .collect::<Vec<_>>();
 
@@ -268,24 +286,39 @@ fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
     let is_update = name.contains("UpdateInput");
     let needs_box = needs_box || name.to_lowercase().contains("nested");
 
-    let list = input.input_types.iter()
-        .find(|typ_ref| typ_ref.is_list);
+    let without_unchecked_input = input.input_types.iter()
+        .filter_map(|typ_ref| {
+            if typ_ref.typ.contains("Unchecked") {
+                None
+            } else {
+                Some(typ_ref)
+            }
+        })
+        .collect::<Vec<_>>();
 
-    let checked_input = input.input_types.iter()
-        .find(|typ_ref| !typ_ref.typ.contains("Checked"));
+    println!("{:#?}", without_unchecked_input);
 
-    let formatted = if let Some(list) = list {
+    // we want to know if there are only 2 possible input types and one is a list.
+    let has_list_variant = if without_unchecked_input.len() == 2 {
+        input.input_types.iter()
+            .find(|typ_ref| typ_ref.is_list)
+    } else {
+        None
+    };
+
+    // if there's a list in the input types, default to it
+    let formatted = if let Some(list) = has_list_variant {
         dmmf_type_to_rust(list, needs_box)
-    } else if let Some(input) = checked_input {
-        dmmf_type_to_rust(input, needs_box)
-    } else if input.input_types.len() > 1 {
+    } else if without_unchecked_input.len() > 1 {
+        println!("enum");
+
         let mut typ_name = format!("{}{}", name.to_pascal_case(), input.name.to_pascal_case());
         if needs_box {
             typ_name = format!("Box<{}>", typ_name);
         }
         typ_name
     } else {
-        dmmf_type_to_rust(&input.input_types[0], needs_box)
+        dmmf_type_to_rust(&without_unchecked_input[0], needs_box)
     };
 
     if !input.is_required && is_update {
@@ -463,11 +496,6 @@ fn format_method_name(name: String) -> String {
 
 #[cfg(test)]
 mod test {
-    use super::*;
-    use datamodel::parse_configuration;
-    use query_core::exec_loader;
-    use request_handlers::GraphQLProtocolAdapter;
-
     #[test]
     fn generate_client() {
         let out = super::generate(r##"
@@ -496,6 +524,6 @@ mod test {
             }
         "##);
 
-        println!("{}", out);
+        // println!("{}", out);
     }
 }
