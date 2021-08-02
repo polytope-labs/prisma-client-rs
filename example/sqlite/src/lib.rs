@@ -17,7 +17,7 @@ mod tests {
         let user = client.create_user::<User>(
             UserCreateInput {
                 name: Some("Seun Lanlege".into()),
-                email: "seun@hbyte.io".into(),
+                email: "seun@squarelabs.i".into(),
                 ..Default::default()
             })
             .await
@@ -29,7 +29,7 @@ mod tests {
             FindManyUserArgs {
                 filter: Some(UserWhereInput {
                     id: Some(UserWhereInputId::IntFilter(IntFilter {
-                        gt: Some(1),
+                        within: Some(vec![1, 3, 5, 7]),
                         ..Default::default()
                     })),
                     ..Default::default()

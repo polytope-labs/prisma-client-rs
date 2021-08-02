@@ -152,14 +152,15 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
     let mut inputs_enums = vec![];
     let types = inputs
         .into_iter()
-        .map(|(input_name, input_type)| {
-            let fields = input_type
+        .map(|(input_name, input_types)| {
+            let fields = input_types
                 .iter()
                 .filter_map(|field| {
                     if field.deprecation.is_some() || input_name.contains("Unchecked") {
                         // no point generating unchecked input types
                         return None
                     }
+                    // rust friendly field name
                     let name = match &*field.name {
                         "where" => "filter".to_owned(),
                         "in" => "within".to_owned(),
@@ -167,6 +168,7 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
                     };
 
                     let is_relation = is_relation(models, &field.name);
+                    // filter out lists, Null, Unchecked types
                     let filtered_types = field.input_types.iter()
                         .filter_map(|typ_ref| {
                             if typ_ref.is_list ||
@@ -180,6 +182,7 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
                         })
                         .collect::<Vec<_>>();
 
+                    // generate an enum for this input field.
                     if filtered_types.len() > 1 {
                         inputs_enums.push(Enum {
                             name: format!("{}{}", &input_name.to_pascal_case(), field.name.to_pascal_case()),
@@ -280,12 +283,15 @@ fn is_relation(models: &Vec<Field>, name: &str) -> bool {
         > 0
 }
 
+/// format the type of DmmfInputField, given the struct name.
 fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
-    let is_update = name.contains("UpdateInput");
+    // only add Option<Option<T>> to Update/Where types,
+    let is_optional = name.contains("UpdateInput") || name.contains("WhereInput");
     let needs_box = needs_box || name.to_lowercase().contains("nested");
 
     let without_unchecked_input = input.input_types.iter()
         .filter_map(|typ_ref| {
+            // filter out unchecked and null types
             if typ_ref.typ.contains("Unchecked") || &typ_ref.typ == "Null" {
                 None
             } else {
@@ -306,6 +312,7 @@ fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
     let formatted = if let Some(list) = has_list_variant {
         dmmf_type_to_rust(list, needs_box)
     } else if without_unchecked_input.len() > 1 {
+        // this is an enum name.
         let mut typ_name = format!("{}{}", name.to_pascal_case(), input.name.to_pascal_case());
         if needs_box {
             typ_name = format!("Box<{}>", typ_name);
@@ -315,7 +322,7 @@ fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
         dmmf_type_to_rust(&without_unchecked_input[0], needs_box)
     };
 
-    if input.is_nullable && is_update {
+    if input.is_nullable && is_optional {
         format!("Option<Option<{}>>", formatted)
     } else if !input.is_required {
         format!("Option<{}>", formatted)
