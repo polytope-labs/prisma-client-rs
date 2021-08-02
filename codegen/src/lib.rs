@@ -169,9 +169,12 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
                     println!("\n\nfield: {}-{:#?}\n\n", input_name, field);
 
                     let is_relation = is_relation(models, &field.name);
-                    let without_list_or_unchecked_input = field.input_types.iter()
+                    let filtered_types = field.input_types.iter()
                         .filter_map(|typ_ref| {
-                            if typ_ref.is_list || typ_ref.typ.contains("Unchecked") {
+                            if typ_ref.is_list ||
+                                typ_ref.typ.contains("Unchecked") ||
+                                &typ_ref.typ == "Null"
+                            {
                                 None
                             } else {
                                 Some(typ_ref)
@@ -179,12 +182,12 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
                         })
                         .collect::<Vec<_>>();
 
-                    println!("{:#?}", without_list_or_unchecked_input);
+                    println!("filtered_types: {:#?}", filtered_types);
 
-                    if without_list_or_unchecked_input.len() > 1 {
+                    if filtered_types.len() > 1 {
                         inputs_enums.push(Enum {
                             name: format!("{}{}", &input_name.to_pascal_case(), field.name.to_pascal_case()),
-                            variants: without_list_or_unchecked_input.iter()
+                            variants: filtered_types.iter()
                                 .map(|type_ref| {
                                     let typ = dmmf_type_to_rust(&type_ref, false);
                                     if type_ref.typ == "Null" {
@@ -237,7 +240,6 @@ fn build_outupts(outputs: Vec<DmmfOutputType>, models: &Vec<Field>) -> Vec<Type>
                 .iter()
                 .filter_map(|field| {
                     if field.deprecation.is_some() {
-                        // agregate fields must start with _
                         return None
                     }
                     let is_relation = is_relation(&models, &field.name);
@@ -288,7 +290,7 @@ fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
 
     let without_unchecked_input = input.input_types.iter()
         .filter_map(|typ_ref| {
-            if typ_ref.typ.contains("Unchecked") {
+            if typ_ref.typ.contains("Unchecked") || &typ_ref.typ == "Null" {
                 None
             } else {
                 Some(typ_ref)
@@ -296,7 +298,7 @@ fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
         })
         .collect::<Vec<_>>();
 
-    println!("{:#?}", without_unchecked_input);
+    println!("without_unchecked_input: {:#?}", without_unchecked_input);
 
     // we want to know if there are only 2 possible input types and one is a list.
     let has_list_variant = if without_unchecked_input.len() == 2 {
@@ -310,8 +312,6 @@ fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
     let formatted = if let Some(list) = has_list_variant {
         dmmf_type_to_rust(list, needs_box)
     } else if without_unchecked_input.len() > 1 {
-        println!("enum");
-
         let mut typ_name = format!("{}{}", name.to_pascal_case(), input.name.to_pascal_case());
         if needs_box {
             typ_name = format!("Box<{}>", typ_name);
@@ -321,7 +321,7 @@ fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
         dmmf_type_to_rust(&without_unchecked_input[0], needs_box)
     };
 
-    if !input.is_required && is_update {
+    if input.is_nullable && is_update {
         format!("Option<Option<{}>>", formatted)
     } else if !input.is_required {
         format!("Option<{}>", formatted)

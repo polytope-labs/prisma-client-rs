@@ -134,7 +134,6 @@ impl Prisma \{
 	// TODO: support transactions.
 	// TODO: add docs to methods
 	// TODO: generate model types
-	// TODO: replace nullable types, with Option<Option<T>>
 
 	{{- for operation in operations }}
     {{- for method in operation.methods }}

@@ -17,10 +17,11 @@ mod tests {
         let user = client.create_user::<User>(
             UserCreateInput {
                 name: Some("Seun Lanlege".into()),
-                email: "seun@parity.io".into(),
+                email: "seun@hbyte.io".into(),
                 ..Default::default()
-            }
-        ).await.unwrap();
+            })
+            .await
+            .unwrap();
 
         println!("{:#?}", user);
 
