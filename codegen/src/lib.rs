@@ -166,8 +166,6 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
                         _ => field.name.to_snake_case()
                     };
 
-                    println!("\n\nfield: {}-{:#?}\n\n", input_name, field);
-
                     let is_relation = is_relation(models, &field.name);
                     let filtered_types = field.input_types.iter()
                         .filter_map(|typ_ref| {
@@ -181,8 +179,6 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
                             }
                         })
                         .collect::<Vec<_>>();
-
-                    println!("filtered_types: {:#?}", filtered_types);
 
                     if filtered_types.len() > 1 {
                         inputs_enums.push(Enum {
@@ -297,8 +293,6 @@ fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
             }
         })
         .collect::<Vec<_>>();
-
-    println!("without_unchecked_input: {:#?}", without_unchecked_input);
 
     // we want to know if there are only 2 possible input types and one is a list.
     let has_list_variant = if without_unchecked_input.len() == 2 {

@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use prisma_client::{Prisma, Query, UserCreateInput};
+    use prisma_client::{Prisma, Query, UserCreateInput, FindManyUserArgs, UserWhereInput, UserWhereInputId, IntFilter};
     use serde::Deserialize;
 
     #[derive(Query, Deserialize, Debug)]
@@ -25,7 +25,18 @@ mod tests {
 
         println!("{:#?}", user);
 
-        let users = client.users::<User>(Default::default()).await.unwrap();
+        let users = client.users::<User>(
+            FindManyUserArgs {
+                filter: Some(UserWhereInput {
+                    id: Some(UserWhereInputId::IntFilter(IntFilter {
+                        gt: Some(1),
+                        ..Default::default()
+                    })),
+                    ..Default::default()
+                }),
+                ..Default::default()
+            }
+        ).await.unwrap();
 
         println!("{:#?}", users);
     }
