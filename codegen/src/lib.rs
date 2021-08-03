@@ -430,6 +430,8 @@ fn build_operation(out: DmmfOutputType, models: &Vec<Field>) -> Option<Value> {
         });
 
     Some(json!({
+        "is_mutation": &operation == "mutation",
+        "is_query": &operation ==  "query",
         "name": operation,
         "methods": methods,
         "input_types": input_types,

@@ -1,7 +1,7 @@
 use std::\{sync::Arc, env};
 
 use datamodel::\{parse_datamodel, parse_configuration, common::preview_features::PreviewFeature};
-use query_core::\{BuildMode, QuerySchema, executor::QueryExecutor, exec_loader, schema_builder};
+use query_core::\{BuildMode, QuerySchema, executor::QueryExecutor, exec_loader, schema_builder, Operation};
 use prisma_models::DatamodelConverter;
 use serde::\{de::DeserializeOwned, Serialize, Deserialize};
 use juniper::GraphQLEnum;
@@ -102,6 +102,78 @@ pub struct Prisma \{
 	query_schema: Arc<QuerySchema>,
 }
 
+pub struct Transaction<'a> \{
+	operations: Vec<Operation>,
+	client: &'a Prisma,
+}
+
+// TODO: implement BatchRequest
+
+impl<'a> Transaction<'a> \{
+	// TODO: split mutations from operations
+	{{- for operation in operations }}
+	{{- if operation.is_mutation }}
+    {{- for method in operation.methods }}
+    pub fn {method.fn_name}<T>(mut self, {method.fn_arg | unescaped}) -> Result<Self, Error>
+        where
+            T: Queryable + DeserializeOwned,
+    \{
+    	let mut operation_args = String::new();
+        // for every query argument, insert it into the gql query.
+        {{- for arg in method.query_args }}
+    	{{- if not arg.is_required }}
+        if {arg.name.render}.is_some() \{
+        	operation_args.push_str(&format!(
+        		"{arg.name.actual}: \{},",
+        		to_query_args({arg.name.render}.as_ref().unwrap()).unwrap()
+        	));
+        }
+        {{- else }}
+        operation_args.push_str(&format!(
+        	"{arg.name.actual}: \{},",
+        	to_query_args(&{arg.name.render}).unwrap()
+        ));
+        {{- endif }}
+    	{{- endfor }}
+
+    	if !operation_args.is_empty() \{
+    		operation_args = format!("(\{})", operation_args);
+    	}
+    	let query = format!(r#"{operation.name} \{\{ {method.query_name} \{} \{} }}"#,
+    		operation_args,
+    		T::query(),
+    	);
+		let document = parse_query(&query)?;
+		let operation = GraphQLProtocolAdapter::convert(document, None).unwrap();
+		self.operations.push(operation);
+    	Ok(self)
+    }
+    {{- endfor }}
+	{{- endif }}
+    {{- endfor }}
+
+	pub async fn execute<T>(self) -> Result<T, Error>
+		where
+			T: Queryable + DeserializeOwned,
+	\{
+		if self.operations.is_empty() \{
+			return Err(Error::Other("No operations specified.".into()))
+		}
+		let query_schema = self.client.query_schema.clone();
+		let responses = self.client.executor.execute_batch(self.operations, true, query_schema).await?;
+		responses.into_iter()
+			.map(|res| match res \{
+			Ok(data) => \{
+				// TODO: deserialize to singular unit struct.
+				Ok(data)
+			},
+			e => e,
+		});
+
+		unimplemented!()
+	}
+}
+
 impl Prisma \{
 	pub async fn new(preview_features: Vec<PreviewFeature>) -> Result<Self, Error> \{
 		let datamodel_str = r###"{datamodel | unescaped}"###;
@@ -129,6 +201,10 @@ impl Prisma \{
 		executor.primary_connector().get_connection().await?;
 
 		Ok(Self \{ executor, query_schema })
+	}
+
+	pub fn transaction<'a>(&'a self) -> Transaction<'a> \{
+		Transaction \{ client: &self, operations: vec![] }
 	}
 
 	// TODO: support transactions.
