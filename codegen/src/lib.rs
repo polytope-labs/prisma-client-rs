@@ -6,7 +6,7 @@ use serde_json::{json, Value};
 use inflector::Inflector;
 
 use datamodel::parse_datamodel;
-use prisma_models::{dml::Field, DatamodelConverter};
+use prisma_models::{dml::{Field, Model}, DatamodelConverter};
 use query_core::{BuildMode, schema_builder};
 use datamodel_connector::ConnectorCapabilities;
 use request_handlers::dmmf::{
@@ -40,13 +40,14 @@ struct Type {
 }
 
 /// Generates the client.
-pub fn write_to_dir(datamodel: &str, path: PathBuf) {
+pub fn generate_prisma(datamodel: &str, path: PathBuf) {
 	let model_str = fs::read_to_string(PathBuf::from(datamodel))
 		.expect("failed to read .prisma file");
     fs::write(path, generate(&model_str))
         .expect("Error while writing to prisma.rs");
 }
 
+/// Given a prisma model, generate the types needed to render the prisma.rs.template
 fn generate(model_str: &str) -> String {
     let model = parse_datamodel(&model_str).unwrap();
     let internal_model = DatamodelConverter::convert(&model.subject).build("".into());
@@ -59,8 +60,9 @@ fn generate(model_str: &str) -> String {
     ));
     let mut dmmf = render_dmmf(&model.subject, query_schema);
 
-    let models = model.subject
+    let relation_fields = model.subject
         .models
+        .clone()
         .into_iter()
         .map(|m| {
             m.fields
@@ -76,6 +78,8 @@ fn generate(model_str: &str) -> String {
         })
         .flatten()
         .collect::<Vec<_>>();
+
+    let models =  convert_model(model.subject.models);    
 
     let enums = dmmf.schema
         .enum_types
@@ -112,7 +116,7 @@ fn generate(model_str: &str) -> String {
             }
         })
         .collect::<Vec<_>>();
-    let (inputs, inputs_enums) = build_inputs(inputs, &models);
+    let (inputs, inputs_enums) = convert_inputs(inputs, &relation_fields);
 
     let (outputs, others) = dmmf.schema.output_object_types
         .remove("prisma")
@@ -125,11 +129,12 @@ fn generate(model_str: &str) -> String {
                 true
             }
         });
-    let outputs = build_outupts(outputs, &models);
+    let mut outputs = convert_outupts(outputs, &relation_fields);
+    outputs.extend(models);
 
     let operations: Vec<Value> = others
         .into_iter()
-        .filter_map(|typ| build_operation(typ, &models))
+        .filter_map(|typ| convert_operation(typ, &relation_fields))
         .collect();
 
     let data = json!({
@@ -143,12 +148,12 @@ fn generate(model_str: &str) -> String {
 
     let mut tt = tinytemplate::TinyTemplate::new();
     tt.add_template("client", include_str!("./prisma.rs.template"))
-        .expect("Couldn't add Template");
+        .expect("prisma template compiles");
     tt.render("client", &data).expect("Couldn't write to template")
 }
 
 /// Convert input objects to TypeField
-fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>) -> (Vec<Type>, Vec<Enum>) {
+fn convert_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, relation_fields: &Vec<Field>) -> (Vec<Type>, Vec<Enum>) {
     let mut inputs_enums = vec![];
     let types = inputs
         .into_iter()
@@ -167,7 +172,7 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
                         _ => field.name.to_snake_case()
                     };
 
-                    let is_relation = is_relation(models, &field.name);
+                    let is_relation = is_relation(relation_fields, &field.name);
                     // filter out lists, Null, Unchecked types
                     let filtered_types = field.input_types.iter()
                         .filter_map(|typ_ref| {
@@ -189,18 +194,10 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
                             variants: filtered_types.iter()
                                 .map(|type_ref| {
                                     let typ = dmmf_type_to_rust(&type_ref, false);
-                                    if type_ref.typ == "Null" {
-                                        TypeName {
-                                            render: "Null".into(),
-                                            rename: true,
-                                            actual: "null".into(),
-                                        }
-                                    } else {
-                                        TypeName {
-                                            render: format!("{}({})", type_ref.typ, typ),
-                                            rename: false,
-                                            actual: format!("")
-                                        }
+                                    TypeName {
+                                        render: format!("{}({})", type_ref.typ, typ),
+                                        rename: false,
+                                        actual: format!("")
                                     }
                                 })
                                 .collect::<Vec<_>>(),
@@ -232,7 +229,7 @@ fn build_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, models: &Vec<Field>)
 }
 
 /// Convert output objects to TypeField
-fn build_outupts(outputs: Vec<DmmfOutputType>, models: &Vec<Field>) -> Vec<Type> {
+fn convert_outupts(outputs: Vec<DmmfOutputType>, relation_fields: &Vec<Field>) -> Vec<Type> {
     outputs.iter()
         .map(|output_type| {
             let fields = output_type.fields
@@ -241,7 +238,7 @@ fn build_outupts(outputs: Vec<DmmfOutputType>, models: &Vec<Field>) -> Vec<Type>
                     if field.deprecation.is_some() {
                         return None
                     }
-                    let is_relation = is_relation(&models, &field.name);
+                    let is_relation = is_relation(&relation_fields, &field.name);
                     let formatted = dmmf_type_to_rust(&field.output_type, is_relation);
                     let formatted = if field.is_nullable {
                         format!("Option<{}>", formatted)
@@ -268,22 +265,88 @@ fn build_outupts(outputs: Vec<DmmfOutputType>, models: &Vec<Field>) -> Vec<Type>
         .collect::<Vec<_>>()
 }
 
-fn is_relation(models: &Vec<Field>, name: &str) -> bool {
-    models
-        .iter()
-        .filter_map(|f| {
-            if name.contains(&f.name()) {
-                Some(())
-            } else {
-                None
+fn convert_model(models: Vec<Model>) -> Vec<Type> {
+    use prisma_models::dml::FieldType;
+    models.into_iter()
+        .map(|model| {
+            let fields = model.fields
+                .into_iter()
+                .map(|field| {
+                    match field {
+                        Field::ScalarField(scalar_field) => {
+                            let type_ref = DmmfTypeReference {
+                                typ: match scalar_field.field_type {
+                                    FieldType::Enum(ref name) => name.clone(),
+                                    FieldType::Scalar(ref scalar, _, _) => scalar.to_string(),
+                                    FieldType::Relation(ref relation) => relation.to.clone(),
+                                    FieldType::Unsupported(ref name) => name.clone(),
+                                },
+                                namespace: None,
+                                location: TypeLocation::Scalar,
+                                is_list: scalar_field.is_list(),
+                            };
+                            let _type = dmmf_type_to_rust(&type_ref, false);
+                            let _type = if !scalar_field.is_required() {
+                                format!("Option<{}>", _type)
+                            } else {
+                                _type
+                            };
+                            TypeField {
+                                is_required: scalar_field.is_required(),
+                                name: TypeName {
+                                    actual: scalar_field.name.clone(),
+                                    rename: false,
+                                    render: scalar_field.name.to_snake_case(),
+                                },
+                                r#type: _type,
+                            }
+                        },
+                        Field::RelationField(relation_field) => {
+                            let type_ref = DmmfTypeReference {
+                                typ: relation_field.relation_info.to.clone(),
+                                namespace: None,
+                                location: TypeLocation::Scalar,
+                                is_list: relation_field.is_list(),
+                            };
+
+                            let _type = dmmf_type_to_rust(&type_ref, false);
+                            let _type = if !relation_field.is_required() {
+                                format!("Option<{}>", _type)
+                            } else {
+                                _type
+                            };
+
+                            TypeField {
+                                is_required: relation_field.is_required(),
+                                name: TypeName {
+                                    actual: relation_field.name.clone(),
+                                    rename: false,
+                                    render: relation_field.name.to_snake_case()
+                                },
+                                r#type: _type
+                            }
+                        }
+                    }
+                })
+                .collect::<Vec<_>>();
+
+            Type {
+                fields,
+                name: model.name
             }
         })
         .collect::<Vec<_>>()
-        .len()
-        > 0
 }
 
-/// format the type of DmmfInputField, given the struct name.
+/// Check if this field is in the list of relations
+fn is_relation(relation_fields: &Vec<Field>, name: &str) -> bool {
+    relation_fields
+        .iter()
+        .find(|f| name.contains(&f.name()))
+        .is_some()
+}
+
+/// Format the type of DmmfInputField, given the struct name.
 fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
     // only add Option<Option<T>> to Update/Where types,
     let is_optional = name.contains("UpdateInput") || name.contains("WhereInput");
@@ -331,7 +394,7 @@ fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
     }
 }
 
-/// converts DmmfTypeReference to a rust type
+/// Converts DmmfTypeReference to a rust type
 fn dmmf_type_to_rust(type_ref: &DmmfTypeReference, needs_box: bool) -> String {
     let formatted = match type_ref.typ.as_str() {
         // graphql scalar types.
@@ -355,7 +418,8 @@ fn dmmf_type_to_rust(type_ref: &DmmfTypeReference, needs_box: bool) -> String {
     }
 }
 
-fn build_operation(out: DmmfOutputType, models: &Vec<Field>) -> Option<Value> {
+/// The actual methods
+fn convert_operation(out: DmmfOutputType, models: &Vec<Field>) -> Option<Value> {
     let operation = out.name.to_lowercase();
 
     let (input_types, input_enums, methods) = out.fields
@@ -415,7 +479,7 @@ fn build_operation(out: DmmfOutputType, models: &Vec<Field>) -> Option<Value> {
                 });
 
             let (input_type, input_enums) = if field.args.len() > 1 {
-                build_inputs(vec![(format!("{}Args", field.name), field.args)], models)
+                convert_inputs(vec![(format!("{}Args", field.name), field.args)], models)
             } else {
                 (vec![], vec![])
             };
