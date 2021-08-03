@@ -398,9 +398,11 @@ fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
 fn dmmf_type_to_rust(type_ref: &DmmfTypeReference, needs_box: bool) -> String {
     let formatted = match type_ref.typ.as_str() {
         // graphql scalar types.
-        "Int" => "i32",
+        "Int" => "i64",
+        "BigInt" => "i64",
         "Float" => "f32",
         "Boolean" => "bool",
+        "Bytes" => "Vec<u8>",
         "DateTime" => "chrono::DateTime<chrono::Utc>",
         "Json" => "serde_json::Value",
         _ => &type_ref.typ,
