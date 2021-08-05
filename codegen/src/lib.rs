@@ -152,7 +152,7 @@ fn generate(model_str: &str) -> String {
     tt.render("client", &data).expect("Couldn't write to template")
 }
 
-/// Convert input objects to TypeField
+/// Convert [`DmmfInputType`] to [`Type`]
 fn convert_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, relation_fields: &Vec<Field>) -> (Vec<Type>, Vec<Enum>) {
     let mut inputs_enums = vec![];
     let types = inputs
@@ -228,7 +228,7 @@ fn convert_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, relation_fields: &
     (types, inputs_enums)
 }
 
-/// Convert output objects to TypeField
+/// Convert [`DmmfOutputType`] to [`Type`]
 fn convert_outupts(outputs: Vec<DmmfOutputType>, relation_fields: &Vec<Field>) -> Vec<Type> {
     outputs.iter()
         .map(|output_type| {
@@ -265,6 +265,7 @@ fn convert_outupts(outputs: Vec<DmmfOutputType>, relation_fields: &Vec<Field>) -
         .collect::<Vec<_>>()
 }
 
+/// Convert a [`Model`] a [`Type`]
 fn convert_model(models: Vec<Model>) -> Vec<Type> {
     use prisma_models::dml::FieldType;
     models.into_iter()
@@ -346,7 +347,7 @@ fn is_relation(relation_fields: &Vec<Field>, name: &str) -> bool {
         .is_some()
 }
 
-/// Format the type of DmmfInputField, given the struct name.
+/// Format the type of [`DmmfInputField`], given the struct name.
 fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
     // only add Option<Option<T>> to Update/Where types,
     let is_optional = name.contains("UpdateInput") || name.contains("WhereInput");
@@ -394,7 +395,7 @@ fn format(input: &DmmfInputField, name: &str, needs_box: bool) -> String {
     }
 }
 
-/// Converts DmmfTypeReference to a rust type
+/// Converts [`DmmfTypeReference`] to a rust type
 fn dmmf_type_to_rust(type_ref: &DmmfTypeReference, needs_box: bool) -> String {
     let formatted = match type_ref.typ.as_str() {
         // graphql scalar types.
@@ -496,8 +497,6 @@ fn convert_operation(out: DmmfOutputType, models: &Vec<Field>) -> Option<Value> 
         });
 
     Some(json!({
-        "is_mutation": &operation == "mutation",
-        "is_query": &operation ==  "query",
         "name": operation,
         "methods": methods,
         "input_types": input_types,

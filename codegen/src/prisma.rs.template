@@ -112,7 +112,6 @@ pub struct Transaction<'a> \{
 impl<'a> Transaction<'a> \{
 	// TODO: split mutations from operations
 	{{- for operation in operations }}
-	{{- if operation.is_mutation }}
     {{- for method in operation.methods }}
     pub fn {method.fn_name}<T>(mut self, {method.fn_arg | unescaped}) -> Result<Self, Error>
         where
@@ -149,7 +148,6 @@ impl<'a> Transaction<'a> \{
     	Ok(self)
     }
     {{- endfor }}
-	{{- endif }}
     {{- endfor }}
 
 	pub async fn execute<T>(self) -> Result<T, Error>
