@@ -1,0 +1,11 @@
+[package]
+name = "sqlite"
+version = "0.1.0"
+authors = ["Seun Lanlege <seun@parity.io>"]
+edition = "2018"
+
+
+[dependencies]
+prisma-client = { path = "../../" }
+tokio = { version = "1.0", features = ["rt-multi-thread", "macros"] }
+serde = { version = "1.0", features = ["serde_derive"] }

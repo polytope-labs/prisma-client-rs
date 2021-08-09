@@ -16,7 +16,7 @@ pub fn my_macro(input: TokenStream) -> TokenStream {
         syn::Data::Struct(s) => s,
         syn::Data::Enum(_) => {
             let expanded = quote! {
-                impl #impl_gen prisma::Queryable for #name #type_gen #where_clause {
+                impl #impl_gen prisma_client::Queryable for #name #type_gen #where_clause {
                     fn query() -> String {
                         String::new()
                     }
@@ -38,13 +38,13 @@ pub fn my_macro(input: TokenStream) -> TokenStream {
                 &f.ty
             );
             quote! {
-                query.push_str(&format!("{} {} ", #name, <#ty as prisma::Queryable>::query()));
+                query.push_str(&format!("{} {} ", #name, <#ty as prisma_client::Queryable>::query()));
             }
         })
         .collect::<Vec<_>>();
 
     let expanded = quote! {
-        impl #impl_gen prisma::Queryable for #name #type_gen #where_clause {
+        impl #impl_gen prisma_client::Queryable for #name #type_gen #where_clause {
             fn query() -> String {
                 let mut query = String::new();
                 #(#fields)*

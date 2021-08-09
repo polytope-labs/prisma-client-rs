@@ -1,3 +1,22 @@
+//! Graphql inline-argument serialization.
+//!
+//! this is entirely for serializing Structs to strings that can be inserted into a graphql query.
+//!
+//! imagine
+//!
+//! ```rust
+//! use prisma::to_query_args;
+//! #[derive(Serialize)]
+//! struct User {
+//!     id: String,
+//!     name: String
+//! }
+//!
+//! to_query_args(&User { id: "28375fb6gsd".into(), name: "Seun Lanlege".into() });
+//! ```
+//! This produces `{ id: "28375fb6gsd", name: "Seun Lanlege" }`
+//!
+//! notice the lack of surrounding quotes of Object keys.
 use serde::{
 	Serialize, Serializer, serde_if_integer128,
 	ser::{self, SerializeSeq, Impossible}
