@@ -10,6 +10,30 @@ mod tests {
         name: String,
     }
 
+    #[derive(Clone, Deserialize, Debug, Query)]
+    pub struct Post {
+        pub id: i64,
+        pub title: String,
+        pub published: bool,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub content: Option<String>,
+        #[query(rename = "viewCount")]
+        #[serde(rename = "viewCount")]
+        pub view_count: i64,
+        #[query(rename = "createdAt")]
+        #[serde(rename = "createdAt")]
+        pub created_at: chrono::DateTime<chrono::Utc>,
+        #[query(rename = "updatedAt")]
+        #[serde(rename = "updatedAt")]
+        pub updated_at: chrono::DateTime<chrono::Utc>,
+    }
+
+    #[derive(Deserialize, Debug)]
+    struct Transaction {
+        users: Vec<User>,
+        posts: Vec<Post>
+    }
+
     #[tokio::test]
     async fn basic_crud() {
         let client = Prisma::new(vec![]).await.unwrap();
@@ -25,8 +49,8 @@ mod tests {
 
         println!("{:#?}", user);
 
-        let users = client.users::<User>(
-            FindManyUserArgs {
+        let response = client.transaction()
+            .users::<User>(FindManyUserArgs {
                 filter: Some(UserWhereInput {
                     id: Some(UserWhereInputId::IntFilter(IntFilter {
                         within: Some(vec![1, 3, 5, 7]),
@@ -35,9 +59,14 @@ mod tests {
                     ..Default::default()
                 }),
                 ..Default::default()
-            }
-        ).await.unwrap();
+            }).unwrap()
+            .posts::<Post>(Default::default()).unwrap()
+            .execute::<Transaction>()
+            .await;
 
-        println!("{:#?}", users);
+        println!("{:#?}", response);
+
+
+        // println!("{:#?}", users);
     }
 }

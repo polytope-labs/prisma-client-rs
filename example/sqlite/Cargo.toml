@@ -9,3 +9,4 @@ edition = "2018"
 prisma-client = { path = "../../" }
 tokio = { version = "1.0", features = ["rt-multi-thread", "macros"] }
 serde = { version = "1.0", features = ["serde_derive"] }
+chrono = "0.4.19"
