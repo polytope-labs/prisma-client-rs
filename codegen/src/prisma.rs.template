@@ -1,11 +1,12 @@
-use std::\{sync::Arc, env};
+use std::\{sync::Arc, env, collections::HashMap};
 
 use datamodel::\{parse_datamodel, parse_configuration, common::preview_features::PreviewFeature};
-use query_core::\{BuildMode, QuerySchema, executor::QueryExecutor, exec_loader, schema_builder, Operation};
+use query_core::\{BuildMode, QuerySchema, executor::QueryExecutor, exec_loader, schema_builder, Operation, ResponseData};
 use prisma_models::DatamodelConverter;
 use serde::\{de::DeserializeOwned, Serialize, Deserialize};
 use juniper::GraphQLEnum;
 use graphql_parser::parse_query;
+use inflector::Inflector;
 use prisma_derive::QueryInternal;
 use request_handlers::GraphQLProtocolAdapter;
 use crate::\{serialization::to_query_args, Queryable};
@@ -152,23 +153,28 @@ impl<'a> Transaction<'a> \{
 
 	pub async fn execute<T>(self) -> Result<T, Error>
 		where
-			T: Queryable + DeserializeOwned,
+			T: DeserializeOwned,
 	\{
 		if self.operations.is_empty() \{
 			return Err(Error::Other("No operations specified.".into()))
 		}
+
 		let query_schema = self.client.query_schema.clone();
 		let responses = self.client.executor.execute_batch(self.operations, true, query_schema).await?;
-		responses.into_iter()
-			.map(|res| match res \{
-			Ok(data) => \{
-				// TODO: deserialize to singular unit struct.
-				Ok(data)
-			},
-			e => e,
-		});
+		let response = responses.into_iter().collect::<Result<Vec<ResponseData>, _>>()?;
 
-		unimplemented!()
+		let map = response.into_iter()
+			.fold(HashMap::new(), |mut map, response| \{
+				map.insert(format_method_name(response.key), response.data);
+				map
+			});
+
+		let value = serde_json::to_value(&map)
+			.expect("Deserializing to serde_json::Value should be infallible");
+		let data = serde_json::from_value(value)
+			.expect("Validation is done by prisma_client_derive::Queryable, this is infallible");
+
+		Ok(data)
 	}
 }
 
@@ -268,3 +274,51 @@ pub enum Error \{
 	Datamodel(datamodel::diagnostics::Diagnostics),
 	Other(String),
 }
+
+/// format the medthod name
+fn format_method_name(name: String) -> String \{
+	if name.contains("findMany") \{
+		return name
+			.replace("findMany", "")
+			.to_snake_case()
+			.to_lowercase()
+			.to_plural();
+	}
+
+	if name.contains("findFirst") \{
+		return name
+			.replace("findFirst", "first ")
+			.to_snake_case()
+			.to_lowercase()
+	}
+
+	if name.contains("aggregate") \{
+		return name
+			.replace("aggregate", "aggregate ")
+			.to_lowercase()
+			.to_snake_case()
+			.to_plural()
+	}
+
+	if name.contains("groupBy") \{
+		return name
+			.replace("groupBy", "group ")
+			.to_lowercase()
+			.to_snake_case()
+			.to_plural()
+	}
+
+	if name.contains("findUnique") \{
+		return name.replace("findUnique", "").to_snake_case().to_lowercase();
+	}
+
+	if name.contains("One") \{
+		return name.replace("One", " ").to_snake_case().to_lowercase();
+	}
+
+	name.replace("Many", " ")
+		.to_snake_case()
+		.to_lowercase()
+		.to_plural()
+}
+
