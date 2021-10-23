@@ -281,6 +281,7 @@ fn convert_model(models: Vec<Model>) -> Vec<Type> {
                                     FieldType::Scalar(ref scalar, _, _) => scalar.to_string(),
                                     FieldType::Relation(ref relation) => relation.to.clone(),
                                     FieldType::Unsupported(ref name) => name.clone(),
+                                    FieldType::CompositeType(ref name) => name.clone(),
                                 },
                                 namespace: None,
                                 location: TypeLocation::Scalar,
@@ -327,6 +328,10 @@ fn convert_model(models: Vec<Model>) -> Vec<Type> {
                                 r#type: _type
                             }
                         }
+                        Field::CompositeField(composite_field) => {
+                            println!("{:#?}", composite_field);
+                            unreachable!()
+                        },
                     }
                 })
                 .collect::<Vec<_>>();

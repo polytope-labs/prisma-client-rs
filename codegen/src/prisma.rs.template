@@ -1,7 +1,7 @@
 use std::\{sync::Arc, env, collections::HashMap};
 
 use datamodel::\{parse_datamodel, parse_configuration, common::preview_features::PreviewFeature};
-use query_core::\{BuildMode, QuerySchema, executor::QueryExecutor, exec_loader, schema_builder, Operation, ResponseData};
+use query_core::\{BuildMode, QuerySchema, executor::\{self, QueryExecutor}, schema_builder, Operation, ResponseData};
 use prisma_models::DatamodelConverter;
 use serde::\{de::DeserializeOwned, Serialize, Deserialize};
 use juniper::GraphQLEnum;
@@ -160,7 +160,7 @@ impl<'a> Transaction<'a> \{
 		}
 
 		let query_schema = self.client.query_schema.clone();
-		let responses = self.client.executor.execute_batch(self.operations, true, query_schema).await?;
+		let responses = self.client.executor.execute_all(None, self.operations, true, query_schema).await?;
 		let response = responses.into_iter().collect::<Result<Vec<ResponseData>, _>>()?;
 
 		let map = response.into_iter()
@@ -191,7 +191,7 @@ impl Prisma \{
 		} else \{
 			source.load_url(|key| env::var(key).ok())?
 		};
-		let (db_name, executor) = exec_loader::load(&source, &preview_features, &url).await?;
+		let (db_name, executor) = executor::load(&source, &preview_features, &url).await?;
 
 		let internal_model = DatamodelConverter::convert(&model).build(db_name);
 		let query_schema = Arc::new(schema_builder::build(
@@ -251,7 +251,7 @@ impl Prisma \{
     	let schema = self.query_schema.clone();
 		let operation = GraphQLProtocolAdapter::convert(document, None).unwrap();
 
-    	let response = self.executor.execute(operation, schema).await?.data;
+    	let response = self.executor.execute(None, operation, schema).await?.data;
 
     	// TODO: implement Deserializer for `Item`
     	// let data = T::deserialize(response)
