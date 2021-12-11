@@ -1,13 +1,13 @@
 //! Given a prisma datamodel, generates a full prisma client with all the appropriate methods and types.
 
-use std::{fs, path::PathBuf, sync::Arc};
+use std::{env, fs, path::PathBuf, sync::Arc};
 use serde::Serialize;
 use serde_json::{json, Value};
 use inflector::Inflector;
 
 use datamodel::parse_datamodel;
-use prisma_models::{dml::{Field, Model}, DatamodelConverter};
-use query_core::{BuildMode, schema_builder};
+use prisma_models::{dml::{Field, Model}, InternalDataModelBuilder};
+use query_core::{BuildMode, executor, schema_builder};
 use datamodel_connector::ConnectorCapabilities;
 use request_handlers::dmmf::{
     render_dmmf, schema::{DmmfTypeReference, TypeLocation, DmmfInputField, DmmfOutputType},
@@ -41,22 +41,28 @@ struct Type {
 
 /// Generates the client.
 pub fn generate_prisma(datamodel: &str, path: PathBuf) {
-	let model_str = fs::read_to_string(PathBuf::from(datamodel))
-		.expect("failed to read .prisma file");
+    let model_str = fs::read_to_string(PathBuf::from(datamodel))
+        .expect("failed to read .prisma file");
     fs::write(path, generate(&model_str))
         .expect("Error while writing to prisma.rs");
 }
 
 /// Given a prisma model, generate the types needed to render the prisma.rs.template
 fn generate(model_str: &str) -> String {
+    let config = datamodel::parse_configuration(&model_str).unwrap().subject;
+    let data_source = config.datasources.first().expect("No valid data source found");
+    let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
+    let db_name = executor::db_name(data_source, &url).unwrap();
+    let internal_data_model = InternalDataModelBuilder::new(&model_str).build(db_name);
+
     let model = parse_datamodel(&model_str).unwrap();
-    let internal_model = DatamodelConverter::convert(&model.subject).build("".into());
     let query_schema = Arc::new(schema_builder::build(
-        internal_model,
+        internal_data_model,
         BuildMode::Modern,
         true,
         ConnectorCapabilities::empty(),
-        vec![]
+        vec![],
+        data_source.referential_integrity(),
     ));
     let mut dmmf = render_dmmf(&model.subject, query_schema);
 
@@ -79,7 +85,7 @@ fn generate(model_str: &str) -> String {
         .flatten()
         .collect::<Vec<_>>();
 
-    let models =  convert_model(model.subject.models);    
+    let models = convert_model(model.subject.models);
 
     let enums = dmmf.schema
         .enum_types
@@ -163,7 +169,7 @@ fn convert_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, relation_fields: &
                 .filter_map(|field| {
                     if field.deprecation.is_some() || input_name.contains("Unchecked") {
                         // no point generating unchecked input types
-                        return None
+                        return None;
                     }
                     // rust friendly field name
                     let name = match &*field.name {
@@ -197,7 +203,7 @@ fn convert_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, relation_fields: &
                                     TypeName {
                                         render: format!("{}({})", type_ref.typ, typ),
                                         rename: false,
-                                        actual: format!("")
+                                        actual: format!(""),
                                     }
                                 })
                                 .collect::<Vec<_>>(),
@@ -211,7 +217,7 @@ fn convert_inputs(inputs: Vec<(String, Vec<DmmfInputField>)>, relation_fields: &
                             rename: true,
                             actual: field.name.clone(),
                         },
-                        r#type: format(&field, &input_name, is_relation)
+                        r#type: format(&field, &input_name, is_relation),
                     };
 
                     Some(type_field)
@@ -236,7 +242,7 @@ fn convert_outupts(outputs: Vec<DmmfOutputType>, relation_fields: &Vec<Field>) -
                 .iter()
                 .filter_map(|field| {
                     if field.deprecation.is_some() {
-                        return None
+                        return None;
                     }
                     let is_relation = is_relation(&relation_fields, &field.name);
                     let formatted = dmmf_type_to_rust(&field.output_type, is_relation);
@@ -302,7 +308,7 @@ fn convert_model(models: Vec<Model>) -> Vec<Type> {
                                 },
                                 r#type: _type,
                             }
-                        },
+                        }
                         Field::RelationField(relation_field) => {
                             let type_ref = DmmfTypeReference {
                                 typ: relation_field.relation_info.to.clone(),
@@ -323,22 +329,22 @@ fn convert_model(models: Vec<Model>) -> Vec<Type> {
                                 name: TypeName {
                                     actual: relation_field.name.clone(),
                                     rename: false,
-                                    render: relation_field.name.to_snake_case()
+                                    render: relation_field.name.to_snake_case(),
                                 },
-                                r#type: _type
+                                r#type: _type,
                             }
                         }
                         Field::CompositeField(composite_field) => {
                             println!("{:#?}", composite_field);
                             unreachable!()
-                        },
+                        }
                     }
                 })
                 .collect::<Vec<_>>();
 
             Type {
                 fields,
-                name: model.name
+                name: model.name,
             }
         })
         .collect::<Vec<_>>()
@@ -468,17 +474,17 @@ fn convert_operation(out: DmmfOutputType, models: &Vec<Field>) -> Option<Value> 
                 })
                 .collect::<Vec<_>>();
 
-                let mut return_ty = String::from("T");
-                if field.output_type.is_list {
-                    return_ty = format!("Vec<{}>", return_ty)
-                }
-                if field.is_nullable {
-                    return_ty = format!("Option<{}>", return_ty)
-                }
+            let mut return_ty = String::from("T");
+            if field.output_type.is_list {
+                return_ty = format!("Vec<{}>", return_ty)
+            }
+            if field.is_nullable {
+                return_ty = format!("Option<{}>", return_ty)
+            }
 
-                let query_name = field.name.clone();
+            let query_name = field.name.clone();
 
-                let method = json!({
+            let method = json!({
                     "fn_name": format_method_name(field.name.clone()),
                     "fn_return": return_ty,
                     "fn_arg": fn_arg,
@@ -534,7 +540,7 @@ fn format_method_name(name: String) -> String {
         return name
             .replace("findFirst", "first ")
             .to_snake_case()
-            .to_lowercase()
+            .to_lowercase();
     }
 
     if name.contains("aggregate") {
@@ -542,7 +548,7 @@ fn format_method_name(name: String) -> String {
             .replace("aggregate", "aggregate ")
             .to_lowercase()
             .to_snake_case()
-            .to_plural()
+            .to_plural();
     }
 
     if name.contains("groupBy") {
@@ -550,7 +556,7 @@ fn format_method_name(name: String) -> String {
             .replace("groupBy", "group ")
             .to_lowercase()
             .to_snake_case()
-            .to_plural()
+            .to_plural();
     }
 
     if name.contains("findUnique") {

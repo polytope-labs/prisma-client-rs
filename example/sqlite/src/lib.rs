@@ -4,7 +4,7 @@ mod tests {
     use serde::Deserialize;
 
     #[derive(Query, Deserialize, Debug)]
-    struct  User {
+    struct User {
         id: i32,
         email: String,
         name: String,
@@ -31,7 +31,7 @@ mod tests {
     #[derive(Deserialize, Debug)]
     struct Transaction {
         users: Vec<User>,
-        posts: Vec<Post>
+        posts: Vec<Post>,
     }
 
     #[tokio::test]
@@ -41,7 +41,7 @@ mod tests {
         let user = client.create_user::<User>(
             UserCreateInput {
                 name: Some("Seun Lanlege".into()),
-                email: "seun@squarelabs.i".into(),
+                email: "seun@squasdrelabs.i".into(),
                 ..Default::default()
             })
             .await

@@ -5,11 +5,11 @@ authors = ["Seun <seunlanlege@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-query-core = { git = "https://github.com/prisma/prisma-engines", rev = "6a51465e8857a85bad0a12d9261efbceaae55dfc" }
-request-handlers = { git = "https://github.com/prisma/prisma-engines", rev = "6a51465e8857a85bad0a12d9261efbceaae55dfc" }
-datamodel-connector = { git = "https://github.com/prisma/prisma-engines", rev = "6a51465e8857a85bad0a12d9261efbceaae55dfc" }
-prisma-models = { git = "https://github.com/prisma/prisma-engines", rev = "6a51465e8857a85bad0a12d9261efbceaae55dfc" }
-datamodel = { git = "https://github.com/prisma/prisma-engines", rev = "6a51465e8857a85bad0a12d9261efbceaae55dfc" }
+query-core = { git = "https://github.com/prisma/prisma-engines", rev = "211e56e18f115fa4d5d9ac2cf2b205d846a889d7" }
+request-handlers = { git = "https://github.com/prisma/prisma-engines", rev = "211e56e18f115fa4d5d9ac2cf2b205d846a889d7" }
+datamodel-connector = { git = "https://github.com/prisma/prisma-engines", rev = "211e56e18f115fa4d5d9ac2cf2b205d846a889d7" }
+prisma-models = { git = "https://github.com/prisma/prisma-engines", rev = "211e56e18f115fa4d5d9ac2cf2b205d846a889d7" }
+datamodel = { git = "https://github.com/prisma/prisma-engines", rev = "211e56e18f115fa4d5d9ac2cf2b205d846a889d7" }
 
 Inflector = "0.11"
 tinytemplate = "1.0"

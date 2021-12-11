@@ -1,8 +1,8 @@
 use std::\{sync::Arc, env, collections::HashMap};
 
-use datamodel::\{parse_datamodel, parse_configuration, common::preview_features::PreviewFeature};
+use datamodel::\{parse_configuration, common::preview_features::PreviewFeature};
 use query_core::\{BuildMode, QuerySchema, executor::\{self, QueryExecutor}, schema_builder, Operation, ResponseData};
-use prisma_models::DatamodelConverter;
+use prisma_models::InternalDataModelBuilder;
 use serde::\{de::DeserializeOwned, Serialize, Deserialize};
 use juniper::GraphQLEnum;
 use graphql_parser::parse_query;
@@ -185,7 +185,6 @@ impl Prisma \{
 		let source = config.datasources.first()
 			.expect("Please supply a datasource in your datamodel.prisma file");
 
-		let model = parse_datamodel(datamodel_str)?.subject;
 		let url = if let Some(url) = source.load_shadow_database_url()? \{
 			url
 		} else \{
@@ -193,13 +192,14 @@ impl Prisma \{
 		};
 		let (db_name, executor) = executor::load(&source, &preview_features, &url).await?;
 
-		let internal_model = DatamodelConverter::convert(&model).build(db_name);
+		let internal_model = InternalDataModelBuilder::new(&datamodel_str).build(db_name);
 		let query_schema = Arc::new(schema_builder::build(
 			internal_model,
 			BuildMode::Modern,
 			true,
 			source.capabilities(),
-			preview_features
+			preview_features,
+			source.referential_integrity(),
 		));
 		// verify connection
 		executor.primary_connector().get_connection().await?;
