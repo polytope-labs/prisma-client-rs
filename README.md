@@ -11,7 +11,7 @@ folder should be siblings.
     ```toml
     [dependencies]
    ...
-    prisma-client = { git = "https://github.com/polytope-labs/prisma-client-rs" }
+    prisma-client = { git = "https://github.com/polytope-labs/prisma-client-rs", branch = "master" }
     serde = { version = "1.0", features = ["serde_derive"] }
     ```
 3. Create a .env in your project root and add the following:
