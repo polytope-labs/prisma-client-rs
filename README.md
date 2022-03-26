@@ -16,6 +16,6 @@ folder should be siblings.
     ```
 3. Create a .env in your project root and add the following:
    ```
-   PRISMA_SCHEMA={PATH_TO_SCHEMA_FILE_HERE}
+   PRISMA_SCHEMA=PATH/TO/SCHEMA/FILE/HERE
    ```
 4. Go through the example in the `example` folder to see how to use the client.   
