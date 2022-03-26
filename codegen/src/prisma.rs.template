@@ -160,7 +160,7 @@ impl<'a> Transaction<'a> \{
 		}
 
 		let query_schema = self.client.query_schema.clone();
-		let responses = self.client.executor.execute_all(None, self.operations, true, query_schema).await?;
+		let responses = self.client.executor.execute_all(None, self.operations, true, query_schema, None).await?;
 		let response = responses.into_iter().collect::<Result<Vec<ResponseData>, _>>()?;
 
 		let map = response.into_iter()
@@ -251,7 +251,7 @@ impl Prisma \{
     	let schema = self.query_schema.clone();
 		let operation = GraphQLProtocolAdapter::convert(document, None).unwrap();
 
-    	let response = self.executor.execute(None, operation, schema).await?.data;
+    	let response = self.executor.execute(None, operation, schema, None).await?.data;
 
     	// TODO: implement Deserializer for `Item`
     	// let data = T::deserialize(response)

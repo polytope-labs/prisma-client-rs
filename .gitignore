@@ -1,4 +1,5 @@
 /**/target
 .idea
+.env
 # generated code
 prisma.rs
