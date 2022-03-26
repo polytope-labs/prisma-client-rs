@@ -12,6 +12,7 @@ path = "lib.rs"
 
 [build-dependencies]
 prisma-codegen = { path = "./codegen" }
+dotenv = "0.15.0"
 
 [dependencies]
 # serialization
@@ -22,11 +23,11 @@ serde = { version = "1.0", features = ["serde_derive"] }
 
 # prisma dependecies
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
-request-handlers = { git = "https://github.com/prisma/prisma-engines", rev = "c3eecc84ac8d11972b9167175f8c4038487ba3f6" }
-query-connector = { git = "https://github.com/prisma/prisma-engines", rev = "c3eecc84ac8d11972b9167175f8c4038487ba3f6" }
-query-core = { git = "https://github.com/prisma/prisma-engines", rev = "c3eecc84ac8d11972b9167175f8c4038487ba3f6" }
-prisma-models = { git = "https://github.com/prisma/prisma-engines", rev = "c3eecc84ac8d11972b9167175f8c4038487ba3f6" }
-datamodel = { git = "https://github.com/prisma/prisma-engines", rev = "c3eecc84ac8d11972b9167175f8c4038487ba3f6" }
+request-handlers = { git = "https://github.com/prisma/prisma-engines", rev = "d15c884f70bfe28d0b3ee1a3efac7fdb991e5de4" }
+query-connector = { git = "https://github.com/prisma/prisma-engines", rev = "d15c884f70bfe28d0b3ee1a3efac7fdb991e5de4" }
+query-core = { git = "https://github.com/prisma/prisma-engines", rev = "d15c884f70bfe28d0b3ee1a3efac7fdb991e5de4" }
+prisma-models = { git = "https://github.com/prisma/prisma-engines", rev = "d15c884f70bfe28d0b3ee1a3efac7fdb991e5de4" }
+datamodel = { git = "https://github.com/prisma/prisma-engines", rev = "d15c884f70bfe28d0b3ee1a3efac7fdb991e5de4" }
 
 # others
 prisma-derive = { path = "./derive" }
