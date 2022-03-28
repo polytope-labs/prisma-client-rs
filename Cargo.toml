@@ -12,7 +12,6 @@ path = "lib.rs"
 
 [build-dependencies]
 prisma-codegen = { path = "./codegen" }
-dotenv = "0.15.0"
 
 [dependencies]
 # serialization
