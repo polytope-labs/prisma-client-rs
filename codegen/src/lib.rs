@@ -45,7 +45,8 @@ struct Type {
 }
 
 /// Generates the client.
-pub fn generate_prisma(datamodel: &str, out_dir: &str) {
+pub fn generate_prisma(datamodel: &str) {
+	let out_dir = env::var_os("OUT_DIR").unwrap();
 	let out_file = PathBuf::from(out_dir).join("prisma.rs");
 	let model_str =
 		fs::read_to_string(PathBuf::from(datamodel)).expect("failed to read .prisma file");
