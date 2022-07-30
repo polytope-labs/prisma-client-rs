@@ -1,12 +1,20 @@
 ///
 use chrono::{DateTime, Utc};
 
-mod prisma;
-mod serialization;
+pub mod serialization;
 
-pub use datamodel::common::preview_features::PreviewFeature;
-pub use prisma::*;
-pub use prisma_derive::Query;
+pub use datamodel::{self, common::preview_features::PreviewFeature};
+pub use graphql_parser;
+pub use inflector;
+pub use juniper;
+pub use prisma_derive::{self, Query};
+pub use prisma_models;
+pub use request_handlers;
+pub use serde;
+pub use log;
+pub use futures;
+pub use query_connector;
+pub use query_core;
 
 /// This allows objects(structs) describe what data they want want from the db.
 ///

@@ -1,20 +1,24 @@
 use std::\{sync::Arc, env, collections::HashMap};
-
-use datamodel::\{parse_configuration, common::preview_features::PreviewFeature};
-use query_core::\{BuildMode, QuerySchema, executor::\{self, QueryExecutor}, schema_builder, Operation, ResponseData};
-use prisma_models::InternalDataModelBuilder;
-use serde::\{de::DeserializeOwned, Serialize, Deserialize};
-use juniper::GraphQLEnum;
-use graphql_parser::parse_query;
-use inflector::Inflector;
-use prisma_derive::QueryInternal;
-use request_handlers::GraphQLProtocolAdapter;
-use crate::\{serialization::to_query_args, Queryable};
+use prisma_client::\{
+	serialization::to_query_args, Queryable, 
+	datamodel::\{self, parse_configuration, common::preview_features::PreviewFeature},
+	query_core::\{self, BuildMode, QuerySchema, executor::\{self, QueryExecutor}, schema_builder, Operation, ResponseData},
+	prisma_models::InternalDataModelBuilder,
+	serde::\{de::DeserializeOwned, Serialize, Deserialize},
+	juniper,
+	graphql_parser::\{self, parse_query},
+	query_connector,
+	inflector::Inflector,
+	prisma_derive::QueryInternal,
+	request_handlers::GraphQLProtocolAdapter,
+	log,
+	futures,
+};
 
 // ====================== Enums ==========================
 
 {{- for enum in enums }}
-#[derive(Clone, PartialEq, Deserialize, Serialize, Debug, QueryInternal, GraphQLEnum)]
+#[derive(Clone, PartialEq, Deserialize, Serialize, Debug, QueryInternal, juniper::GraphQLEnum)]
 pub enum {enum.name} \{
 	{{- for variant in enum.variants}}
 	#[serde(rename = "{variant.actual}")]

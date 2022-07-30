@@ -365,9 +365,8 @@ impl<'a> Serializer for &'a mut QueryArgumentSerializer {
 			let mut adapter = Adapter { writer: &mut self.writer, error: None };
 			match write!(adapter, "{}", value) {
 				Ok(()) => assert!(adapter.error.is_none()),
-				Err(fmt::Error) => {
-					return Err(Error::IO(adapter.error.expect("there should be an error")))
-				},
+				Err(fmt::Error) =>
+					return Err(Error::IO(adapter.error.expect("there should be an error"))),
 			}
 		}
 		end_string(&mut self.writer)?;
