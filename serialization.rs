@@ -18,19 +18,16 @@
 //!
 //! notice the lack of surrounding quotes of Object keys.
 use serde::{
-	Serialize, Serializer, serde_if_integer128,
-	ser::{self, SerializeSeq, Impossible}
+	ser::{self, Impossible, SerializeSeq},
+	serde_if_integer128, Serialize, Serializer,
 };
-use std::{fmt::Display, io, fmt};
-use std::num::FpCategory;
+use std::{fmt, fmt::Display, io, num::FpCategory};
 
 pub fn to_query_args<T>(data: T) -> Result<String>
-	where
-		T: Serialize
+where
+	T: Serialize,
 {
-	let mut serializer = QueryArgumentSerializer {
-		writer: Vec::new(),
-	};
+	let mut serializer = QueryArgumentSerializer { writer: Vec::new() };
 
 	data.serialize(&mut serializer)?;
 
@@ -46,15 +43,15 @@ struct QueryArgumentSerializer {
 pub enum Error {
 	KeyMustBeAString,
 	IO(io::Error),
-	Custom(String)
+	Custom(String),
 }
 
 impl std::error::Error for Error {}
 
 impl ser::Error for Error {
 	fn custom<T>(msg: T) -> Self
-		where
-			T: Display
+	where
+		T: Display,
 	{
 		Error::Custom(format!("{}", msg))
 	}
@@ -105,11 +102,11 @@ impl<'a> Serializer for &'a mut QueryArgumentSerializer {
 	}
 
 	serde_if_integer128! {
-        fn serialize_i128(self, value: i128) -> Result<()> {
-            write_number_str(&mut self.writer, &value.to_string())?;
-            Ok(())
-        }
-    }
+		fn serialize_i128(self, value: i128) -> Result<()> {
+			write_number_str(&mut self.writer, &value.to_string())?;
+			Ok(())
+		}
+	}
 
 	#[inline]
 	fn serialize_u8(self, value: u8) -> Result<()> {
@@ -136,21 +133,21 @@ impl<'a> Serializer for &'a mut QueryArgumentSerializer {
 	}
 
 	serde_if_integer128! {
-        fn serialize_u128(self, value: u128) -> Result<()> {
-            write_number_str(&mut self.writer, &value.to_string())?;
-            Ok(())
-        }
-    }
+		fn serialize_u128(self, value: u128) -> Result<()> {
+			write_number_str(&mut self.writer, &value.to_string())?;
+			Ok(())
+		}
+	}
 
 	#[inline]
 	fn serialize_f32(self, value: f32) -> Result<()> {
 		match value.classify() {
 			FpCategory::Nan | FpCategory::Infinite => {
-                write_null(&mut self.writer)?;
-			}
+				write_null(&mut self.writer)?;
+			},
 			_ => {
-                write_f32(&mut self.writer, value)?;
-			}
+				write_f32(&mut self.writer, value)?;
+			},
 		}
 		Ok(())
 	}
@@ -159,11 +156,11 @@ impl<'a> Serializer for &'a mut QueryArgumentSerializer {
 	fn serialize_f64(self, value: f64) -> Result<()> {
 		match value.classify() {
 			FpCategory::Nan | FpCategory::Infinite => {
-                write_null(&mut self.writer)?;
-			}
+				write_null(&mut self.writer)?;
+			},
 			_ => {
-                write_f64(&mut self.writer, value)?;
-			}
+				write_f64(&mut self.writer, value)?;
+			},
 		}
 		Ok(())
 	}
@@ -197,8 +194,8 @@ impl<'a> Serializer for &'a mut QueryArgumentSerializer {
 
 	#[inline]
 	fn serialize_some<T>(self, value: &T) -> Result<()>
-		where
-			T: ?Sized + Serialize,
+	where
+		T: ?Sized + Serialize,
 	{
 		value.serialize(self)
 	}
@@ -227,8 +224,8 @@ impl<'a> Serializer for &'a mut QueryArgumentSerializer {
 	/// Serialize newtypes without an object wrapper.
 	#[inline]
 	fn serialize_newtype_struct<T>(self, _name: &'static str, value: &T) -> Result<()>
-		where
-			T: ?Sized + Serialize,
+	where
+		T: ?Sized + Serialize,
 	{
 		value.serialize(self)
 	}
@@ -241,8 +238,8 @@ impl<'a> Serializer for &'a mut QueryArgumentSerializer {
 		variant: &'static str,
 		value: &T,
 	) -> Result<()>
-		where
-			T: ?Sized + Serialize,
+	where
+		T: ?Sized + Serialize,
 	{
 		begin_object(&mut self.writer)?;
 		begin_object_key(&mut self.writer, true)?;
@@ -260,16 +257,10 @@ impl<'a> Serializer for &'a mut QueryArgumentSerializer {
 		if len == Some(0) {
 			begin_array(&mut self.writer)?;
 			end_array(&mut self.writer)?;
-			Ok(Compound {
-				ser: self,
-				state: State::Empty,
-			})
+			Ok(Compound { ser: self, state: State::Empty })
 		} else {
 			begin_array(&mut self.writer)?;
-			Ok(Compound {
-				ser: self,
-				state: State::First,
-			})
+			Ok(Compound { ser: self, state: State::First })
 		}
 	}
 
@@ -308,16 +299,10 @@ impl<'a> Serializer for &'a mut QueryArgumentSerializer {
 		if len == Some(0) {
 			begin_object(&mut self.writer)?;
 			end_object(&mut self.writer)?;
-			Ok(Compound {
-				ser: self,
-				state: State::Empty,
-			})
+			Ok(Compound { ser: self, state: State::Empty })
 		} else {
 			begin_object(&mut self.writer)?;
-			Ok(Compound {
-				ser: self,
-				state: State::First,
-			})
+			Ok(Compound { ser: self, state: State::First })
 		}
 	}
 
@@ -349,8 +334,8 @@ impl<'a> Serializer for &'a mut QueryArgumentSerializer {
 	}
 
 	fn collect_str<T>(self, value: &T) -> Result<()>
-		where
-			T: ?Sized + Display,
+	where
+		T: ?Sized + Display,
 	{
 		use self::fmt::Write;
 
@@ -360,8 +345,8 @@ impl<'a> Serializer for &'a mut QueryArgumentSerializer {
 		}
 
 		impl<'ser, W> fmt::Write for Adapter<'ser, W>
-			where
-				W: io::Write,
+		where
+			W: io::Write,
 		{
 			fn write_str(&mut self, s: &str) -> fmt::Result {
 				assert!(self.error.is_none());
@@ -370,22 +355,19 @@ impl<'a> Serializer for &'a mut QueryArgumentSerializer {
 					Err(err) => {
 						self.error = Some(err);
 						Err(fmt::Error)
-					}
+					},
 				}
 			}
 		}
 
 		begin_string(&mut self.writer)?;
 		{
-			let mut adapter = Adapter {
-				writer: &mut self.writer,
-				error: None,
-			};
+			let mut adapter = Adapter { writer: &mut self.writer, error: None };
 			match write!(adapter, "{}", value) {
 				Ok(()) => assert!(adapter.error.is_none()),
 				Err(fmt::Error) => {
-					return Err(Error::IO(adapter.error.expect("there should be an error")));
-				}
+					return Err(Error::IO(adapter.error.expect("there should be an error")))
+				},
 			}
 		}
 		end_string(&mut self.writer)?;
@@ -415,8 +397,8 @@ impl<'a> ser::SerializeSeq for Compound<'a> {
 
 	#[inline]
 	fn serialize_element<T>(&mut self, value: &T) -> Result<()>
-		where
-			T: ?Sized + Serialize,
+	where
+		T: ?Sized + Serialize,
 	{
 		begin_array_value(&mut self.ser.writer, self.state == State::First)?;
 		self.state = State::Rest;
@@ -428,7 +410,7 @@ impl<'a> ser::SerializeSeq for Compound<'a> {
 	#[inline]
 	fn end(self) -> Result<()> {
 		match self.state {
-			State::Empty => {}
+			State::Empty => {},
 			_ => end_array(&mut self.ser.writer)?,
 		}
 		Ok(())
@@ -441,8 +423,8 @@ impl<'a> ser::SerializeTuple for Compound<'a> {
 
 	#[inline]
 	fn serialize_element<T>(&mut self, value: &T) -> Result<()>
-		where
-			T: ?Sized + Serialize,
+	where
+		T: ?Sized + Serialize,
 	{
 		ser::SerializeSeq::serialize_element(self, value)
 	}
@@ -459,8 +441,8 @@ impl<'a> ser::SerializeTupleStruct for Compound<'a> {
 
 	#[inline]
 	fn serialize_field<T>(&mut self, value: &T) -> Result<()>
-		where
-			T: ?Sized + Serialize,
+	where
+		T: ?Sized + Serialize,
 	{
 		ser::SerializeSeq::serialize_element(self, value)
 	}
@@ -477,8 +459,8 @@ impl<'a> ser::SerializeTupleVariant for Compound<'a> {
 
 	#[inline]
 	fn serialize_field<T>(&mut self, value: &T) -> Result<()>
-		where
-			T: ?Sized + Serialize,
+	where
+		T: ?Sized + Serialize,
 	{
 		ser::SerializeSeq::serialize_element(self, value)
 	}
@@ -486,7 +468,7 @@ impl<'a> ser::SerializeTupleVariant for Compound<'a> {
 	#[inline]
 	fn end(self) -> Result<()> {
 		match self.state {
-			State::Empty => {}
+			State::Empty => {},
 			_ => end_array(&mut self.ser.writer)?,
 		}
 		end_object_value(&mut self.ser.writer)?;
@@ -501,8 +483,8 @@ impl<'a> ser::SerializeMap for Compound<'a> {
 
 	#[inline]
 	fn serialize_key<T>(&mut self, key: &T) -> Result<()>
-		where
-			T: ?Sized + Serialize,
+	where
+		T: ?Sized + Serialize,
 	{
 		begin_object_key(&mut self.ser.writer, self.state == State::First)?;
 		self.state = State::Rest;
@@ -513,8 +495,8 @@ impl<'a> ser::SerializeMap for Compound<'a> {
 
 	#[inline]
 	fn serialize_value<T>(&mut self, value: &T) -> Result<()>
-		where
-			T: ?Sized + Serialize,
+	where
+		T: ?Sized + Serialize,
 	{
 		begin_object_value(&mut self.ser.writer)?;
 		value.serialize(&mut *self.ser)?;
@@ -525,7 +507,7 @@ impl<'a> ser::SerializeMap for Compound<'a> {
 	#[inline]
 	fn end(self) -> Result<()> {
 		match self.state {
-			State::Empty => {}
+			State::Empty => {},
 			_ => end_object(&mut self.ser.writer)?,
 		}
 		Ok(())
@@ -538,8 +520,8 @@ impl<'a> ser::SerializeStruct for Compound<'a> {
 
 	#[inline]
 	fn serialize_field<T>(&mut self, key: &'static str, value: &T) -> Result<()>
-		where
-			T: ?Sized + Serialize,
+	where
+		T: ?Sized + Serialize,
 	{
 		ser::SerializeMap::serialize_entry(self, key, value)
 	}
@@ -556,8 +538,8 @@ impl<'a> ser::SerializeStructVariant for Compound<'a> {
 
 	#[inline]
 	fn serialize_field<T>(&mut self, key: &'static str, value: &T) -> Result<()>
-		where
-			T: ?Sized + Serialize,
+	where
+		T: ?Sized + Serialize,
 	{
 		ser::SerializeStruct::serialize_field(self, key, value)
 	}
@@ -565,7 +547,7 @@ impl<'a> ser::SerializeStructVariant for Compound<'a> {
 	#[inline]
 	fn end(self) -> Result<()> {
 		match self.state {
-			State::Empty => {}
+			State::Empty => {},
 			_ => end_object(&mut self.ser.writer)?,
 		}
 		end_object_value(&mut self.ser.writer)?;
@@ -602,8 +584,8 @@ impl<'a> ser::Serializer for MapKeySerializer<'a> {
 
 	#[inline]
 	fn serialize_newtype_struct<T>(self, _name: &'static str, value: &T) -> Result<()>
-		where
-			T: ?Sized + Serialize,
+	where
+		T: ?Sized + Serialize,
 	{
 		value.serialize(self)
 	}
@@ -649,13 +631,13 @@ impl<'a> ser::Serializer for MapKeySerializer<'a> {
 	}
 
 	serde_if_integer128! {
-        fn serialize_i128(self, value: i128) -> Result<()> {
-            begin_string(&mut self.ser.writer)?;
-            write_number_str(&mut self.ser.writer, &value.to_string())?;
-            end_string(&mut self.ser.writer)?;
-            Ok(())
-        }
-    }
+		fn serialize_i128(self, value: i128) -> Result<()> {
+			begin_string(&mut self.ser.writer)?;
+			write_number_str(&mut self.ser.writer, &value.to_string())?;
+			end_string(&mut self.ser.writer)?;
+			Ok(())
+		}
+	}
 
 	fn serialize_u8(self, value: u8) -> Result<()> {
 		begin_string(&mut self.ser.writer)?;
@@ -686,13 +668,13 @@ impl<'a> ser::Serializer for MapKeySerializer<'a> {
 	}
 
 	serde_if_integer128! {
-        fn serialize_u128(self, value: u128) -> Result<()> {
-            begin_string(&mut self.ser.writer)?;
-            write_number_str(&mut self.ser.writer, &value.to_string())?;
-            end_string(&mut self.ser.writer)?;
-            Ok(())
-        }
-    }
+		fn serialize_u128(self, value: u128) -> Result<()> {
+			begin_string(&mut self.ser.writer)?;
+			write_number_str(&mut self.ser.writer, &value.to_string())?;
+			end_string(&mut self.ser.writer)?;
+			Ok(())
+		}
+	}
 
 	fn serialize_f32(self, _value: f32) -> Result<()> {
 		Err(Error::KeyMustBeAString)
@@ -725,8 +707,8 @@ impl<'a> ser::Serializer for MapKeySerializer<'a> {
 		_variant: &'static str,
 		_value: &T,
 	) -> Result<()>
-		where
-			T: ?Sized + Serialize,
+	where
+		T: ?Sized + Serialize,
 	{
 		Err(Error::KeyMustBeAString)
 	}
@@ -736,8 +718,8 @@ impl<'a> ser::Serializer for MapKeySerializer<'a> {
 	}
 
 	fn serialize_some<T>(self, _value: &T) -> Result<()>
-		where
-			T: ?Sized + Serialize,
+	where
+		T: ?Sized + Serialize,
 	{
 		Err(Error::KeyMustBeAString)
 	}
@@ -787,8 +769,8 @@ impl<'a> ser::Serializer for MapKeySerializer<'a> {
 	}
 
 	fn collect_str<T>(self, value: &T) -> Result<()>
-		where
-			T: ?Sized + Display,
+	where
+		T: ?Sized + Display,
 	{
 		self.ser.collect_str(value)
 	}
@@ -797,8 +779,8 @@ impl<'a> ser::Serializer for MapKeySerializer<'a> {
 /// Writes a `null` value to the specified writer.
 #[inline]
 fn write_null<W>(writer: &mut W) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	writer.write_all(b"null")
 }
@@ -806,22 +788,18 @@ fn write_null<W>(writer: &mut W) -> io::Result<()>
 /// Writes a `true` or `false` value to the specified writer.
 #[inline]
 fn write_bool<W>(writer: &mut W, value: bool) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
-	let s = if value {
-		b"true" as &[u8]
-	} else {
-		b"false" as &[u8]
-	};
+	let s = if value { b"true" as &[u8] } else { b"false" as &[u8] };
 	writer.write_all(s)
 }
 
 /// Writes an integer value like `-123` to the specified writer.
 #[inline]
 fn write_i8<W>(writer: &mut W, value: i8) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	let mut buffer = itoa::Buffer::new();
 	let s = buffer.format(value);
@@ -831,8 +809,8 @@ fn write_i8<W>(writer: &mut W, value: i8) -> io::Result<()>
 /// Writes an integer value like `-123` to the specified writer.
 #[inline]
 fn write_i16<W>(writer: &mut W, value: i16) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	let mut buffer = itoa::Buffer::new();
 	let s = buffer.format(value);
@@ -842,8 +820,8 @@ fn write_i16<W>(writer: &mut W, value: i16) -> io::Result<()>
 /// Writes an integer value like `-123` to the specified writer.
 #[inline]
 fn write_i32<W>(writer: &mut W, value: i32) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	let mut buffer = itoa::Buffer::new();
 	let s = buffer.format(value);
@@ -853,8 +831,8 @@ fn write_i32<W>(writer: &mut W, value: i32) -> io::Result<()>
 /// Writes an integer value like `-123` to the specified writer.
 #[inline]
 fn write_i64<W>(writer: &mut W, value: i64) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	let mut buffer = itoa::Buffer::new();
 	let s = buffer.format(value);
@@ -864,8 +842,8 @@ fn write_i64<W>(writer: &mut W, value: i64) -> io::Result<()>
 /// Writes an integer value like `123` to the specified writer.
 #[inline]
 fn write_u8<W>(writer: &mut W, value: u8) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	let mut buffer = itoa::Buffer::new();
 	let s = buffer.format(value);
@@ -875,8 +853,8 @@ fn write_u8<W>(writer: &mut W, value: u8) -> io::Result<()>
 /// Writes an integer value like `123` to the specified writer.
 #[inline]
 fn write_u16<W>(writer: &mut W, value: u16) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	let mut buffer = itoa::Buffer::new();
 	let s = buffer.format(value);
@@ -886,8 +864,8 @@ fn write_u16<W>(writer: &mut W, value: u16) -> io::Result<()>
 /// Writes an integer value like `123` to the specified writer.
 #[inline]
 fn write_u32<W>(writer: &mut W, value: u32) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	let mut buffer = itoa::Buffer::new();
 	let s = buffer.format(value);
@@ -897,8 +875,8 @@ fn write_u32<W>(writer: &mut W, value: u32) -> io::Result<()>
 /// Writes an integer value like `123` to the specified writer.
 #[inline]
 fn write_u64<W>(writer: &mut W, value: u64) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	let mut buffer = itoa::Buffer::new();
 	let s = buffer.format(value);
@@ -908,8 +886,8 @@ fn write_u64<W>(writer: &mut W, value: u64) -> io::Result<()>
 /// Writes a floating point value like `-31.26e+12` to the specified writer.
 #[inline]
 fn write_f32<W>(writer: &mut W, value: f32) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	let mut buffer = ryu::Buffer::new();
 	let s = buffer.format_finite(value);
@@ -919,8 +897,8 @@ fn write_f32<W>(writer: &mut W, value: f32) -> io::Result<()>
 /// Writes a floating point value like `-31.26e+12` to the specified writer.
 #[inline]
 fn write_f64<W>(writer: &mut W, value: f64) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	let mut buffer = ryu::Buffer::new();
 	let s = buffer.format_finite(value);
@@ -930,8 +908,8 @@ fn write_f64<W>(writer: &mut W, value: f64) -> io::Result<()>
 /// Writes a number that has already been rendered to a string.
 #[inline]
 fn write_number_str<W>(writer: &mut W, value: &str) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	writer.write_all(value.as_bytes())
 }
@@ -940,8 +918,8 @@ fn write_number_str<W>(writer: &mut W, value: &str) -> io::Result<()>
 /// `write_char_escape`.  Writes a `"` to the specified writer.
 #[inline]
 fn begin_string<W>(writer: &mut W) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	writer.write_all(b"\"")
 }
@@ -950,8 +928,8 @@ fn begin_string<W>(writer: &mut W) -> io::Result<()>
 /// `write_char_escape`.  Writes a `"` to the specified writer.
 #[inline]
 fn end_string<W>(writer: &mut W) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	writer.write_all(b"\"")
 }
@@ -960,12 +938,11 @@ fn end_string<W>(writer: &mut W) -> io::Result<()>
 /// specified writer.
 #[inline]
 fn write_string_fragment<W>(writer: &mut W, fragment: &str) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	writer.write_all(fragment.as_bytes())
 }
-
 
 /// Represents a character escape code in a type-safe manner.
 enum CharEscape {
@@ -1005,7 +982,6 @@ impl CharEscape {
 	}
 }
 
-
 const BB: u8 = b'b'; // \x08
 const TT: u8 = b't'; // \x09
 const NN: u8 = b'n'; // \x0A
@@ -1038,12 +1014,11 @@ static ESCAPE: [u8; 256] = [
 	__, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, // F
 ];
 
-
 /// Writes a character escape code to the specified writer.
 #[inline]
 fn write_char_escape<W>(writer: &mut W, char_escape: CharEscape) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	use self::CharEscape::*;
 
@@ -1065,8 +1040,8 @@ fn write_char_escape<W>(writer: &mut W, char_escape: CharEscape) -> io::Result<(
 				HEX_DIGITS[(byte >> 4) as usize],
 				HEX_DIGITS[(byte & 0xF) as usize],
 			];
-			return writer.write_all(bytes);
-		}
+			return writer.write_all(bytes)
+		},
 	};
 
 	writer.write_all(s)
@@ -1076,8 +1051,8 @@ fn write_char_escape<W>(writer: &mut W, char_escape: CharEscape) -> io::Result<(
 /// writer.
 #[inline]
 fn begin_array<W>(writer: &mut W) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	writer.write_all(b"[")
 }
@@ -1086,8 +1061,8 @@ fn begin_array<W>(writer: &mut W) -> io::Result<()>
 /// writer.
 #[inline]
 fn end_array<W>(writer: &mut W) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	writer.write_all(b"]")
 }
@@ -1096,8 +1071,8 @@ fn end_array<W>(writer: &mut W) -> io::Result<()>
 /// the specified writer.
 #[inline]
 fn begin_array_value<W>(writer: &mut W, first: bool) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	if first {
 		Ok(())
@@ -1109,8 +1084,8 @@ fn begin_array_value<W>(writer: &mut W, first: bool) -> io::Result<()>
 /// Called after every array value.
 #[inline]
 fn end_array_value<W>(_: &mut W) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	Ok(())
 }
@@ -1119,8 +1094,8 @@ fn end_array_value<W>(_: &mut W) -> io::Result<()>
 /// writer.
 #[inline]
 fn begin_object<W>(writer: &mut W) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	writer.write_all(b"{")
 }
@@ -1129,8 +1104,8 @@ fn begin_object<W>(writer: &mut W) -> io::Result<()>
 /// writer.
 #[inline]
 fn end_object<W>(writer: &mut W) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	writer.write_all(b"}")
 }
@@ -1138,8 +1113,8 @@ fn end_object<W>(writer: &mut W) -> io::Result<()>
 /// Called before every object key.
 #[inline]
 fn begin_object_key<W>(writer: &mut W, first: bool) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	if first {
 		Ok(())
@@ -1153,8 +1128,8 @@ fn begin_object_key<W>(writer: &mut W, first: bool) -> io::Result<()>
 /// `begin_object_value`.
 #[inline]
 fn end_object_key<W>(_: &mut W) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	Ok(())
 }
@@ -1164,8 +1139,8 @@ fn end_object_key<W>(_: &mut W) -> io::Result<()>
 /// `end_object_key`.
 #[inline]
 fn begin_object_value<W>(writer: &mut W) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	writer.write_all(b":")
 }
@@ -1173,16 +1148,15 @@ fn begin_object_value<W>(writer: &mut W) -> io::Result<()>
 /// Called after every object value.
 #[inline]
 fn end_object_value<W>(_: &mut W) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	Ok(())
 }
 
-
 fn format_escaped_str<W>(writer: &mut W, value: &str) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+where
+	W: ?Sized + io::Write,
 {
 	begin_string(writer)?;
 	format_escaped_str_contents(writer, value)?;
@@ -1190,12 +1164,9 @@ fn format_escaped_str<W>(writer: &mut W, value: &str) -> io::Result<()>
 	Ok(())
 }
 
-fn format_escaped_str_contents<W>(
-	writer: &mut W,
-	value: &str,
-) -> io::Result<()>
-	where
-		W: ?Sized + io::Write,
+fn format_escaped_str_contents<W>(writer: &mut W, value: &str) -> io::Result<()>
+where
+	W: ?Sized + io::Write,
 {
 	let bytes = value.as_bytes();
 
@@ -1204,7 +1175,7 @@ fn format_escaped_str_contents<W>(
 	for (i, &byte) in bytes.iter().enumerate() {
 		let escape = ESCAPE[byte as usize];
 		if escape == 0 {
-			continue;
+			continue
 		}
 
 		if start < i {
@@ -1227,7 +1198,7 @@ fn format_escaped_str_contents<W>(
 #[cfg(test)]
 mod tests {
 	use super::*;
-	use serde::{Serialize, Deserialize};
+	use serde::{Deserialize, Serialize};
 
 	#[derive(Serialize, Deserialize, Clone)]
 	struct Person {
@@ -1237,13 +1208,8 @@ mod tests {
 
 	#[test]
 	fn it_works() {
-		let person = Person {
-			name: "Seun".into(),
-			age: 22,
-		};
+		let person = Person { name: "Seun".into(), age: 22 };
 
-		assert_eq!(
-			r###"{name:"Seun",age:22}"###,
-			to_query_args(person).unwrap())
+		assert_eq!(r###"{name:"Seun",age:22}"###, to_query_args(person).unwrap())
 	}
 }

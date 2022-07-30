@@ -4,8 +4,8 @@ use chrono::{DateTime, Utc};
 mod prisma;
 mod serialization;
 
-pub use prisma::*;
 pub use datamodel::common::preview_features::PreviewFeature;
+pub use prisma::*;
 pub use prisma_derive::Query;
 
 /// This allows objects(structs) describe what data they want want from the db.
@@ -21,7 +21,6 @@ pub use prisma_derive::Query;
 ///
 /// User::query(); // Produces `{ id name }`, which is then interpolated into a graphql query.
 /// ```
-///
 pub trait Queryable {
 	fn query() -> String;
 }
@@ -38,18 +37,7 @@ macro_rules! generate_queryable_impl {
 	}
 }
 
-generate_queryable_impl!(
-	i64,
-	i32,
-	i16,
-	i8,
-	f64,
-	f32,
-	&str,
-	bool,
-	String,
-	DateTime<Utc>
-);
+generate_queryable_impl!(i64, i32, i16, i8, f64, f32, &str, bool, String, DateTime<Utc>);
 
 impl<T: Queryable> Queryable for Vec<T> {
 	fn query() -> String {
