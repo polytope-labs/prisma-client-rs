@@ -1,9 +1,8 @@
 use std::env;
 
 fn main() {
-	// get the prisma schema path from .env
-	let prisma_schema = env::var("PRISMA_SCHEMA")
-		.expect("Please set the enviroment variable to the absolute path of your prisma schema");
-	prisma_codegen::generate_prisma(&prisma_schema, "./prisma.rs".into());
+	let prisma_schema = "example/sqlite/prisma/schema.prisma";
+	let out_dir = env::var_os("OUT_DIR").unwrap();
+	prisma_codegen::generate_prisma(&prisma_schema, &out_dir.to_str().unwrap());
 	println!("cargo:rerun-if-changed={}", prisma_schema);
 }

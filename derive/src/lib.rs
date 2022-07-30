@@ -2,131 +2,130 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, DeriveInput, Meta, MetaList, NestedMeta, Lit, Attribute};
+use syn::{parse_macro_input, Attribute, DeriveInput, Lit, Meta, MetaList, NestedMeta};
 
 /// Derives a Queryable trait for a struct/enum
 #[proc_macro_derive(Query, attributes(query))]
 pub fn my_macro(input: TokenStream) -> TokenStream {
-    // Parse the input tokens into a syntax tree
-    let input = parse_macro_input!(input as DeriveInput);
-    let name = input.ident;
-    let (impl_gen, type_gen, where_clause) = input.generics.split_for_impl();
+	// Parse the input tokens into a syntax tree
+	let input = parse_macro_input!(input as DeriveInput);
+	let name = input.ident;
+	let (impl_gen, type_gen, where_clause) = input.generics.split_for_impl();
 
-    let m = match input.data {
-        syn::Data::Struct(s) => s,
-        syn::Data::Enum(_) => {
-            let expanded = quote! {
-                impl #impl_gen prisma_client::Queryable for #name #type_gen #where_clause {
-                    fn query() -> String {
-                        String::new()
-                    }
-                }
-            };
+	let m = match input.data {
+		syn::Data::Struct(s) => s,
+		syn::Data::Enum(_) => {
+			let expanded = quote! {
+				impl #impl_gen prisma_client::Queryable for #name #type_gen #where_clause {
+					fn query() -> String {
+						String::new()
+					}
+				}
+			};
 
-            // Hand the output tokens back to the compiler
-            return TokenStream::from(expanded)
-        }
-        _ => unreachable!(),
-    };
-    // todo: validate against remote struct.
-    let fields = m.fields.iter()
-        .map(|f| {
-            let rename = get_rename(&f.attrs);
-            let (name, ty) = (
-                rename.or_else(|| Some(format!("{}", f.ident.as_ref().unwrap())))
-                    .unwrap(),
-                &f.ty
-            );
-            quote! {
-                query.push_str(&format!("{} {} ", #name, <#ty as prisma_client::Queryable>::query()));
-            }
-        })
-        .collect::<Vec<_>>();
+			// Hand the output tokens back to the compiler
+			return TokenStream::from(expanded)
+		},
+		_ => unreachable!(),
+	};
+	// todo: validate against remote struct.
+	let fields = m
+		.fields
+		.iter()
+		.map(|f| {
+			let rename = get_rename(&f.attrs);
+			let (name, ty) =
+				(rename.or_else(|| Some(format!("{}", f.ident.as_ref().unwrap()))).unwrap(), &f.ty);
+			quote! {
+				query.push_str(&format!("{} {} ", #name, <#ty as prisma_client::Queryable>::query()));
+			}
+		})
+		.collect::<Vec<_>>();
 
-    let expanded = quote! {
-        impl #impl_gen prisma_client::Queryable for #name #type_gen #where_clause {
-            fn query() -> String {
-                let mut query = String::new();
-                #(#fields)*
-                format!("{{ {}}}", query)
-            }
-        }
-    };
+	let expanded = quote! {
+		impl #impl_gen prisma_client::Queryable for #name #type_gen #where_clause {
+			fn query() -> String {
+				let mut query = String::new();
+				#(#fields)*
+				format!("{{ {}}}", query)
+			}
+		}
+	};
 
-    // Hand the output tokens back to the compiler
-    TokenStream::from(expanded)
+	// Hand the output tokens back to the compiler
+	TokenStream::from(expanded)
 }
 
 /// to be used internally by the prisma lib.
 #[proc_macro_derive(QueryInternal, attributes(query))]
 pub fn my_macro2(input: TokenStream) -> TokenStream {
-    // Parse the input tokens into a syntax tree
-    let input = parse_macro_input!(input as DeriveInput);
-    let name = input.ident;
-    let (impl_gen, type_gen, where_clause) = input.generics.split_for_impl();
+	// Parse the input tokens into a syntax tree
+	let input = parse_macro_input!(input as DeriveInput);
+	let name = input.ident;
+	let (impl_gen, type_gen, where_clause) = input.generics.split_for_impl();
 
-    let m = match input.data {
-        syn::Data::Struct(s) => s,
-        syn::Data::Enum(_) => {
-            let expanded = quote! {
-                impl #impl_gen Queryable for #name #type_gen #where_clause {
-                    fn query() -> String {
-                        String::new()
-                    }
-                }
-            };
+	let m = match input.data {
+		syn::Data::Struct(s) => s,
+		syn::Data::Enum(_) => {
+			let expanded = quote! {
+				impl #impl_gen Queryable for #name #type_gen #where_clause {
+					fn query() -> String {
+						String::new()
+					}
+				}
+			};
 
-            // Hand the output tokens back to the compiler
-            return TokenStream::from(expanded)
-        }
-        _ => unreachable!(),
-    };
-    // todo: validate against remote struct.
-    let fields = m.fields.iter()
-        .map(|f| {
-            let rename = get_rename(&f.attrs);
-            let (name, ty) = (
-                rename.or_else(|| Some(format!("{}", f.ident.as_ref().unwrap())))
-                    .unwrap(),
-                &f.ty
-            );
-            quote! {
-                query.push_str(&format!("{} {} ", #name, <#ty as Queryable>::query()));
-            }
-        })
-        .collect::<Vec<_>>();
+			// Hand the output tokens back to the compiler
+			return TokenStream::from(expanded)
+		},
+		_ => unreachable!(),
+	};
+	// todo: validate against remote struct.
+	let fields = m
+		.fields
+		.iter()
+		.map(|f| {
+			let rename = get_rename(&f.attrs);
+			let (name, ty) =
+				(rename.or_else(|| Some(format!("{}", f.ident.as_ref().unwrap()))).unwrap(), &f.ty);
+			quote! {
+				query.push_str(&format!("{} {} ", #name, <#ty as Queryable>::query()));
+			}
+		})
+		.collect::<Vec<_>>();
 
-    let expanded = quote! {
-        impl #impl_gen Queryable for #name #type_gen #where_clause {
-            fn query() -> String {
-                let mut query = String::new();
-                #(#fields)*
-                format!("{{ {}}}", query)
-            }
-        }
-    };
+	let expanded = quote! {
+		impl #impl_gen Queryable for #name #type_gen #where_clause {
+			fn query() -> String {
+				let mut query = String::new();
+				#(#fields)*
+				format!("{{ {}}}", query)
+			}
+		}
+	};
 
-    // Hand the output tokens back to the compiler
-    TokenStream::from(expanded)
+	// Hand the output tokens back to the compiler
+	TokenStream::from(expanded)
 }
 
 fn get_rename(attrs: &Vec<Attribute>) -> Option<String> {
-    attrs.iter()
-        // this looks like a christmas tree
-        .filter_map(|a| {
-            if a.path.is_ident("query") {
-                if let Meta::List(MetaList { nested, .. }) =  a.parse_meta().ok()? {
-                    if let Some(NestedMeta::Meta(Meta::NameValue(name))) = nested.first() {
-                       if name.path.is_ident("rename") {
-                           if let Lit::Str(lstr) = &name.lit {
-                               return Some(lstr.value())
-                           }
-                       }
-                    }
-                }
-            }
-            None
-        })
-        .collect::<Vec<_>>()
-        .pop()
+	attrs
+		.iter()
+		// this looks like a christmas tree
+		.filter_map(|a| {
+			if a.path.is_ident("query") {
+				if let Meta::List(MetaList { nested, .. }) = a.parse_meta().ok()? {
+					if let Some(NestedMeta::Meta(Meta::NameValue(name))) = nested.first() {
+						if name.path.is_ident("rename") {
+							if let Lit::Str(lstr) = &name.lit {
+								return Some(lstr.value())
+							}
+						}
+					}
+				}
+			}
+			None
+		})
+		.collect::<Vec<_>>()
+		.pop()
 }
